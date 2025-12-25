@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Backend API
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: zenith-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/api:/app
+      - ./apps/api/models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - zenith-network
+    restart: unless-stopped
+
+  # Frontend Web
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: zenith-web
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    networks:
+      - zenith-network
+    restart: unless-stopped
+
+networks:
+  zenith-network:
+    driver: bridge

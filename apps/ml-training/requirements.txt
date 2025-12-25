@@ -1,0 +1,21 @@
+torch==2.2.0
+pytorch-lightning==2.1.3
+torchmetrics==1.3.0
+numpy==1.26.4
+pandas==2.2.0
+scikit-learn==1.4.1
+scipy==1.12.0
+# Dataset processing
+h5py==3.10.0
+pyedflib==0.1.36
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.1
+# Explainability
+shap==0.44.1
+# Config
+pyyaml==6.0.1
+# Progress
+tqdm==4.66.1
+# Weights & Biases (optional)
+wandb==0.16.2

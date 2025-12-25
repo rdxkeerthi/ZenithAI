@@ -1,0 +1,70 @@
+"""
+Training Configuration for Stress Detection LSTM
+
+This config file defines all hyperparameters and settings for training.
+Modify this file to experiment with different architectures and training strategies.
+"""
+
+# Model Architecture
+model:
+  type: "standard"  # Options: "standard", "with_confidence"
+  input_dim: 24  # Number of input features per timestep
+  hidden_dim: 128  # LSTM hidden units
+  num_layers: 2  # Number of LSTM layers
+  output_dim: 3  # Number of stress classes (Low=0, Medium=1, High=2)
+  dropout: 0.3  # Dropout probability
+  bidirectional: true  # Use bidirectional LSTM
+
+# Data
+data:
+  dataset: "wesad"  # Options: "wesad", "deap", "mahnob", "combined"
+  data_dir: "apps/ml-training/data/raw"
+  processed_dir: "apps/ml-training/data/processed"
+  sequence_length: 30  # Number of timesteps in each sequence
+  overlap: 0.5  # Overlap ratio for sliding windows
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+  batch_size: 32
+  num_workers: 4
+  
+# Training
+training:
+  max_epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  optimizer: "adam"  # Options: "adam", "adamw", "sgd"
+  scheduler: "reduce_on_plateau"  # Options: "reduce_on_plateau", "cosine", "step"
+  early_stopping_patience: 10
+  gradient_clip_val: 1.0
+  
+  # Mixed precision training (faster on GPU)
+  use_amp: true
+  
+  # Class weights (for imbalanced datasets)
+  use_class_weights: true
+  
+# Validation
+validation:
+  metric: "f1_macro"  # Primary metric for model selection
+  check_val_every_n_epoch: 1
+  
+# Checkpointing
+checkpoint:
+  save_top_k: 3  # Keep top 3 models
+  monitor: "val_f1_macro"
+  mode: "max"
+  save_dir: "apps/ml-training/checkpoints"
+  
+# Logging
+logging:
+  use_wandb: false  # Set to true to enable Weights & Biases logging
+  wandb_project: "zenith-stress-detection"
+  log_every_n_steps: 10
+  
+# Reproducibility
+seed: 42
+
+# Hardware
+accelerator: "auto"  # Options: "auto", "gpu", "cpu"
+devices: 1
