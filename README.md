@@ -211,7 +211,7 @@ ZenithAI addresses these challenges through:
 
 ### High-Level Architecture
 
-\`\`\`mermaid
+```mermaid
 graph TB
     subgraph "Client Layer"
         A[Web Browser] --> B[Next.js Frontend]
@@ -257,11 +257,11 @@ graph TB
     style H fill:#ffccbc
     style K fill:#c5e1a5
     style J fill:#fff9c4
-\`\`\`
+```
 
 ### Component Interaction Diagram
 
-\`\`\`mermaid
+```mermaid
 graph LR
     subgraph "Frontend Components"
         A[UserDataForm] --> B[CameraAnalysis]
@@ -293,11 +293,11 @@ graph LR
     style D fill:#e0f2f1
     style E fill:#fce4ec
     style F fill:#e3f2fd
-\`\`\`
+```
 
 ### System Flow Diagram
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     Start([User Opens App]) --> A[Fill User Data Form]
     A --> B{Data Valid?}
@@ -324,11 +324,11 @@ flowchart TD
     style Q fill:#4caf50
     style C fill:#ff9800
     style L fill:#2196f3
-\`\`\`
+```
 
 ### Dashboard Data Flow
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     participant U as User
     participant F as Frontend
@@ -353,11 +353,11 @@ sequenceDiagram
     U->>F: End Session
     F->>WS: Disconnect
     F->>DB: Save Final Data
-\`\`\`
+```
 
 ### AI Detector Workflow
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
     A[Face Metrics Input] --> B{Model Available?}
     B -->|Yes| C[LSTM Model]
@@ -383,11 +383,11 @@ flowchart LR
     style D fill:#ff9800
     style G fill:#2196f3
     style P fill:#f44336
-\`\`\`
+```
 
 ### Project Folder Structure
 
-\`\`\`mermaid
+```mermaid
 graph TD
     A[ai-stress/] --> B[apps/]
     A --> C[docs/]
@@ -431,11 +431,11 @@ graph TD
     style B fill:#fff3e0
     style H fill:#f3e5f5
     style I fill:#e8f5e9
-\`\`\`
+```
 
 ### Core Analysis Workflow
 
-\`\`\`mermaid
+```mermaid
 stateDiagram-v2
     [*] --> UserDataCollection
     UserDataCollection --> CameraInitialization
@@ -467,11 +467,11 @@ stateDiagram-v2
         Confidence scoring
         Risk classification
     end note
-\`\`\`
+```
 
 ### Use Case Diagram
 
-\`\`\`mermaid
+```mermaid
 graph TB
     subgraph "ZenithAI System"
         UC1[Complete Stress Assessment]
@@ -503,11 +503,11 @@ graph TB
     style User fill:#4caf50
     style AI fill:#2196f3
     style Doctor fill:#ff9800
-\`\`\`
+```
 
 ### Sequence Diagram: Attack Detection Flow
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     participant U as User
     participant C as Camera
@@ -558,11 +558,11 @@ sequenceDiagram
     FE->>RP: Generate PDF
     RP-->>FE: PDF File
     FE-->>U: Download
-\`\`\`
+```
 
 ### Class Diagram
 
-\`\`\`mermaid
+```mermaid
 classDiagram
     class UserData {
         +string name
@@ -642,11 +642,11 @@ classDiagram
     Recommendations "1" --> "1" Report
     InferenceService ..> StressAnalysis : creates
     Report ..> Recommendations : generates
-\`\`\`
+```
 
 ### Activity Diagram
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     Start([Start Assessment]) --> A{User Logged In?}
     A -->|No| B[Create Account]
@@ -701,11 +701,11 @@ flowchart TD
     style End fill:#f44336
     style U fill:#2196f3
     style X fill:#ff9800
-\`\`\`
+```
 
 ### State Diagram (State Machine)
 
-\`\`\`mermaid
+```mermaid
 stateDiagram-v2
     [*] --> Idle
     
@@ -753,11 +753,11 @@ stateDiagram-v2
         Confidence calculation
         Risk classification
     end note
-\`\`\`
+```
 
 ### Component Diagram
 
-\`\`\`mermaid
+```mermaid
 graph TB
     subgraph "Presentation Layer"
         A[Next.js App]
@@ -824,11 +824,11 @@ graph TB
     style H fill:#fff3e0
     style K fill:#f3e5f5
     style N fill:#e8f5e9
-\`\`\`
+```
 
 ### System Graph Diagram
 
-\`\`\`mermaid
+```mermaid
 graph TD
     subgraph "User Interface"
         UI[Web Dashboard]
@@ -888,11 +888,11 @@ graph TD
     style BE1 fill:#2196f3
     style CS1 fill:#ff9800
     style ML1 fill:#9c27b0
-\`\`\`
+```
 
 ### Protocol Flow Graph
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     autonumber
     participant Browser
@@ -932,7 +932,7 @@ sequenceDiagram
     
     Frontend->>WebSocket: Close Connection
     WebSocket-->>Frontend: Connection Closed
-\`\`\`
+```
 
 ---
 
@@ -986,18 +986,18 @@ sequenceDiagram
 
 **One-command deployment**:
 
-\`\`\`bash
+```bash
 # Clone repository
 git clone https://github.com/yourusername/ai-stress.git
 cd ai-stress
 
 # Deploy with Docker
 ./docker-deploy.sh
-\`\`\`
+```
 
 **Manual Docker commands**:
 
-\`\`\`bash
+```bash
 # Build images
 docker-compose build
 
@@ -1009,13 +1009,13 @@ docker-compose logs -f
 
 # Stop containers
 docker-compose down
-\`\`\`
+```
 
 ### Option 2: Local Development
 
 **Backend Setup**:
 
-\`\`\`bash
+```bash
 cd apps/api
 
 # Create virtual environment
@@ -1027,11 +1027,11 @@ pip install -r requirements.txt
 
 # Run server
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-\`\`\`
+```
 
 **Frontend Setup**:
 
-\`\`\`bash
+```bash
 cd apps/web
 
 # Install dependencies
@@ -1039,13 +1039,13 @@ npm install
 
 # Run development server
 npm run dev
-\`\`\`
+```
 
 ### Environment Variables
 
 Create `.env` file in root:
 
-\`\`\`env
+```bash
 # Backend
 PYTHONUNBUFFERED=1
 API_HOST=0.0.0.0
@@ -1054,7 +1054,7 @@ API_PORT=8000
 # Frontend
 NODE_ENV=development
 NEXT_PUBLIC_API_URL=http://localhost:8000
-\`\`\`
+```
 
 ---
 
@@ -1134,17 +1134,17 @@ Click "New Analysis" to:
 ### Sample Report Sections
 
 #### Executive Summary
-\`\`\`
+```
 Risk Level: MODERATE
 Risk Score: 7/20
 Average Stress: 45.3%
 Peak Stress: 68%
 Cognitive Performance: 82%
 AI Confidence: 87%
-\`\`\`
+```
 
 #### Medical Recommendations
-\`\`\`
+```
 Priority: HIGH
 
 Immediate Actions:
@@ -1160,10 +1160,10 @@ Medications to Discuss:
 Specialist Consultations:
 - Clinical Psychologist
 - Occupational Health Physician
-\`\`\`
+```
 
 #### Meditation Program
-\`\`\`
+```
 Techniques:
 1. Box Breathing (4-4-4-4): 5 min, 4x daily
 2. Progressive Muscle Relaxation: 20 min before bed
@@ -1173,10 +1173,10 @@ Techniques:
 Duration: 30-45 minutes total daily
 Frequency: Multiple sessions throughout day
 Apps: Headspace, Calm, Insight Timer
-\`\`\`
+```
 
 #### Workout Plan
-\`\`\`
+```
 Weekly Schedule:
 - Monday: Cardio (30 min) + Stretching (10 min)
 - Tuesday: Strength Training (45 min)
@@ -1186,10 +1186,10 @@ Weekly Schedule:
 - Weekend: Outdoor Activity/Favorite Sport (60 min)
 
 Intensity: Moderate to High
-\`\`\`
+```
 
 #### Phone & Screen Management
-\`\`\`
+```
 Current Screen Time: 12 hours/day
 
 Recommendations:
@@ -1201,7 +1201,7 @@ Recommendations:
 - No phone 1 hour before bed
 - Use grayscale mode to reduce addiction
 - Set app time limits: Social media max 30 min/day
-\`\`\`
+```
 
 ### Export Formats
 
@@ -1220,7 +1220,7 @@ Recommendations:
 - Can be customized
 
 **JSON Output**:
-\`\`\`json
+```json
 {
   "userData": {
     "name": "John Doe",
@@ -1241,7 +1241,7 @@ Recommendations:
     "workout": {...}
   }
 }
-\`\`\`
+```
 
 ---
 
@@ -1249,7 +1249,7 @@ Recommendations:
 
 This project is licensed under the **MIT License**.
 
-\`\`\`
+```
 MIT License
 
 Copyright (c) 2025 ZenithAI
@@ -1271,7 +1271,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-\`\`\`
+```
 
 ---
 
