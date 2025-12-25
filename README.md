@@ -1242,7 +1242,37 @@ Recommendations:
   }
 }
 ```
+---
 
+## Gallery 
+
+
+### Home Page
+![alt text](image.png)
+
+### User Input
+![alt text](image-1.png)
+
+### Face Analysis
+![alt text](image-2.png)
+
+### Game-1 Analysis 
+![alt text](image-3.png)
+
+### Game-2 Analysis 
+![alt text](image-4.png)
+
+### Game-3 Analysis 
+![alt text](image-5.png)
+
+### Game-4 Analysis
+![alt text](image-6.png)
+
+### Report-1 
+![alt text](image-7.png)
+
+### Report-2
+![alt text](image-8.png)
 ---
 
 ## 📄 License
