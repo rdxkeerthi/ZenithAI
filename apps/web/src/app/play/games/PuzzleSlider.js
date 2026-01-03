@@ -48,24 +48,24 @@ export default function PuzzleSliderGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🧩 Puzzle Slider</h2>
-            <p className="text-muted mb-4">Moves: {moves}</p>
-            <p className="text-sm mb-8">Arrange tiles in order 1-8</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🧩 Puzzle Slider</h2>
+            <p className="text-text-muted mb-4 font-semibold">Moves: {moves}</p>
+            <p className="text-sm mb-8 text-text-secondary font-medium">Arrange tiles in order 1-8</p>
 
             <div className="grid grid-cols-3 gap-2 max-w-sm">
                 {tiles.map((tile, idx) => (
                     <div
                         key={idx}
                         onClick={() => handleTileClick(idx)}
-                        className={`aspect-square rounded-lg flex items-center justify-center text-4xl font-bold cursor-pointer transition-all ${tile === 0
-                                ? 'bg-transparent'
+                        className={`aspect-square rounded-xl flex items-center justify-center text-4xl font-bold cursor-pointer transition-all border-2 ${tile === 0
+                                ? 'bg-transparent border-transparent'
                                 : canMove(idx)
-                                    ? 'bg-primary hover:bg-primary-light'
-                                    : 'bg-tertiary'
+                                    ? 'bg-primary/25 border-primary hover:bg-primary/40 hover:shadow-md'
+                                    : 'bg-secondary/20 border-secondary/40'
                             }`}
                     >
-                        {tile !== 0 && tile}
+                        {tile !== 0 && <span className="text-primary font-black">{tile}</span>}
                     </div>
                 ))}
             </div>

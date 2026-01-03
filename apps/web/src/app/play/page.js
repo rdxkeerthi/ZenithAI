@@ -215,32 +215,35 @@ export default function PlayPage() {
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center text-white">
-                <div className="text-2xl animate-pulse">Loading...</div>
+            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] flex items-center justify-center text-text-primary">
+                <div className="text-2xl font-semibold animate-pulse">Loading...</div>
             </div>
         )
     }
 
     if (!gameStarted) {
         return (
-            <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
-                <div className="bg-[#16213e] p-10 rounded-3xl shadow-2xl max-w-2xl w-full text-center border border-[#0f3460]">
-                    <h1 className="text-5xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)] flex items-center justify-center p-4">
+                <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
+                    <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-50"></div>
+                </div>
+                <div className="bg-white p-12 rounded-2xl shadow-lg max-w-2xl w-full text-center border border-primary/10">
+                    <h1 className="text-5xl font-bold mb-6 gradient-text">
                         Ready for Analysis?
                     </h1>
-                    <p className="text-xl text-gray-300 mb-10 leading-relaxed">
+                    <p className="text-xl text-text-secondary mb-10 leading-relaxed">
                         We have prepared diverse cognitive challenges.
                         Please allow camera access for real-time stress monitoring.
                     </p>
                     <button
                         onClick={startSession}
                         disabled={loading}
-                        className="bg-[#e94560] hover:bg-[#ff2e63] text-white text-xl font-bold py-4 px-12 rounded-xl transition-all transform hover:scale-105 shadow-lg"
+                        className="btn btn-primary text-xl font-bold py-4 px-12 rounded-xl transition-all transform hover:scale-105 shadow-lg"
                     >
                         {loading ? 'Initializing AI...' : 'Start Session'}
                     </button>
-                    <div className="mt-8 text-sm text-gray-400">
-                        Session ID: <span className="font-mono text-purple-400">#{Date.now().toString().slice(-6)}</span>
+                    <div className="mt-8 text-sm text-text-muted">
+                        Session ID: <span className="font-mono text-primary">#{Date.now().toString().slice(-6)}</span>
                     </div>
                 </div>
             </div>
@@ -248,17 +251,17 @@ export default function PlayPage() {
     }
 
     return (
-        <div className="h-screen w-screen bg-[#1a1a2e] text-white overflow-hidden p-4 font-sans">
+        <div className="h-screen w-screen bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] text-text-primary overflow-hidden p-4 font-sans">
             {/* 2x2 Grid Container */}
             <div className="grid grid-cols-2 grid-rows-2 gap-4 h-full w-full">
 
                 {/* 1. TOP-LEFT: Game Scroll Viewport */}
-                <div className="col-span-1 row-span-1 bg-[#16213e] rounded-3xl border border-[#0f3460] relative overflow-hidden flex flex-col shadow-2xl">
-                    <div className="absolute top-0 left-0 right-0 p-4 bg-[#16213e]/90 backdrop-blur z-20 border-b border-[#0f3460] flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                            <span className="text-[#e94560]">🎮</span> Active Challenge
+                <div className="col-span-1 row-span-1 bg-white rounded-2xl border border-primary/10 relative overflow-hidden flex flex-col shadow-lg">
+                    <div className="absolute top-0 left-0 right-0 p-4 bg-white/95 backdrop-blur z-20 border-b border-primary/10 flex justify-between items-center">
+                        <h2 className="text-xl font-bold text-primary-dark flex items-center gap-2">
+                            <span>🎮</span> Active Challenge
                         </h2>
-                        <span className="text-xs bg-purple-900/50 text-purple-300 px-3 py-1 rounded-full border border-purple-500/30">
+                        <span className="text-xs bg-primary/10 text-primary font-semibold px-3 py-1 rounded-full border border-primary/20">
                             Game {(currentGameIndex || 0) + 1} / 4
                         </span>
                     </div>
@@ -282,11 +285,11 @@ export default function PlayPage() {
                                 >
                                     <div className={`flex-1 p-6 flex flex-col ${isCompleted ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
                                         <div className="mb-4">
-                                            <h3 className="text-3xl font-bold text-white mb-1">{Game.name}</h3>
-                                            <p className="text-gray-400 text-sm">Task: Complete the objective as fast as possible.</p>
+                                            <h3 className="text-3xl font-bold text-primary-dark mb-1">{Game.name}</h3>
+                                            <p className="text-text-secondary text-sm">Task: Complete the objective as fast as possible.</p>
                                         </div>
 
-                                        <div className="flex-1 bg-[#0f3460]/30 rounded-2xl border border-white/5 overflow-hidden relative">
+                                        <div className="flex-1 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border border-primary/15 overflow-hidden relative">
                                             {GameComponent && (
                                                 <GameComponent onComplete={(data) => handleGameComplete(data, idx)} />
                                             )}
@@ -295,8 +298,8 @@ export default function PlayPage() {
 
                                     {/* Completed Overlay */}
                                     {isCompleted && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px] z-10 transition-all duration-500">
-                                            <div className="bg-[#10b981] text-black font-black text-2xl px-6 py-3 rounded-xl transform -rotate-6 shadow-glow border-4 border-white/20">
+                                        <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[2px] z-10 transition-all duration-500">
+                                            <div className="bg-success text-white font-black text-2xl px-6 py-3 rounded-xl transform -rotate-6 shadow-lg border-4 border-white/30">
                                                 COMPLETED!
                                             </div>
                                         </div>
@@ -313,11 +316,11 @@ export default function PlayPage() {
                         >
                             <div className="text-center p-8 animate-fade-in">
                                 <div className="text-8xl mb-6">🏆</div>
-                                <h2 className="text-4xl font-bold mb-4 text-white">Session Complete</h2>
-                                <p className="text-xl text-gray-400 mb-8">Great work! Your analysis is ready.</p>
+                                <h2 className="text-4xl font-bold mb-4 text-primary-dark">Session Complete</h2>
+                                <p className="text-xl text-text-secondary mb-8">Great work! Your analysis is ready.</p>
                                 <button
                                     onClick={completeSession}
-                                    className="bg-gradient-to-r from-purple-600 to-blue-600 px-12 py-4 rounded-2xl font-bold text-xl hover:shadow-glow hover:scale-105 transition-all"
+                                    className="btn btn-primary px-12 py-4 rounded-xl font-bold text-xl hover:shadow-glow transition-all"
                                 >
                                     View Final Report
                                 </button>
@@ -327,18 +330,18 @@ export default function PlayPage() {
                 </div>
 
                 {/* 2. TOP-RIGHT: Camera Feed */}
-                <div className="col-span-1 row-span-1 bg-[#16213e] rounded-3xl border border-[#0f3460] overflow-hidden relative flex flex-col shadow-2xl">
-                    <div className="p-4 border-b border-[#0f3460] flex justify-between items-center bg-[#16213e]">
-                        <h2 className="text-lg font-bold text-gray-200 flex items-center gap-2">
+                <div className="col-span-1 row-span-1 bg-white rounded-2xl border border-primary/10 overflow-hidden relative flex flex-col shadow-lg">
+                    <div className="p-4 border-b border-primary/10 flex justify-between items-center bg-white">
+                        <h2 className="text-lg font-bold text-primary-dark flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                             Live Camera Output
                         </h2>
                         <div className="flex gap-2">
-                            <div className="w-3 h-3 rounded-full bg-[#1a1a2e] border border-gray-600"></div>
-                            <div className="w-3 h-3 rounded-full bg-[#1a1a2e] border border-gray-600"></div>
+                            <div className="w-3 h-3 rounded-full bg-primary/20 border border-primary/40"></div>
+                            <div className="w-3 h-3 rounded-full bg-primary/20 border border-primary/40"></div>
                         </div>
                     </div>
-                    <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden group">
+                    <div className="flex-1 relative bg-white/50 flex items-center justify-center overflow-hidden group">
                         <FaceTracking
                             ref={faceTrackingRef}
                             onStressUpdate={handleStressUpdate}
@@ -346,8 +349,8 @@ export default function PlayPage() {
 
                         {/* Camera Overlay UI - Tech Corners */}
                         <div className="absolute inset-0 pointer-events-none">
-                            <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-blue-500/50 rounded-tl-lg"></div>
-                            <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-blue-500/50 rounded-tr-lg"></div>
+                            <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-primary/40 rounded-tl-lg"></div>
+                            <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-primary/40 rounded-tr-lg"></div>
                             <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-blue-500/50 rounded-bl-lg"></div>
                             <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-blue-500/50 rounded-br-lg"></div>
 

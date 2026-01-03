@@ -43,24 +43,27 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4">
-            <div className="card max-w-md w-full animate-fade-in">
+        <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)]">
+            <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
+                <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-50"></div>
+            </div>
+            <div className="card max-w-md w-full animate-fade-in bg-white shadow-lg border border-primary/10 rounded-2xl">
                 <h1 className="text-3xl font-bold mb-2 gradient-text">Welcome Back</h1>
-                <p className="text-muted mb-6">Sign in to continue your stress monitoring journey</p>
+                <p className="text-text-secondary mb-6">Sign in to continue your stress monitoring journey</p>
 
                 {error && (
-                    <div className="bg-danger/20 border border-danger text-danger px-4 py-3 rounded mb-4">
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium mb-2">Email</label>
+                        <label className="block text-sm font-semibold text-text-primary mb-2">Email</label>
                         <input
                             type="email"
                             required
-                            className="input"
+                            className="w-full px-4 py-3 border border-primary/15 rounded-lg bg-[var(--bg-tertiary)] text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder="your@email.com"
@@ -68,11 +71,11 @@ export default function LoginPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">Password</label>
+                        <label className="block text-sm font-semibold text-text-primary mb-2">Password</label>
                         <input
                             type="password"
                             required
-                            className="input"
+                            className="w-full px-4 py-3 border border-primary/15 rounded-lg bg-[var(--bg-tertiary)] text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             placeholder="••••••••"
@@ -81,16 +84,16 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        className="btn btn-primary w-full"
+                        className="btn btn-primary w-full py-3 text-base font-semibold rounded-lg transition-all"
                         disabled={loading}
                     >
                         {loading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
 
-                <p className="mt-6 text-center text-muted">
+                <p className="mt-6 text-center text-text-secondary">
                     Don't have an account?{' '}
-                    <a href="/register" className="text-primary hover:underline">
+                    <a href="/register" className="text-primary font-semibold hover:text-accent transition-colors">
                         Create one
                     </a>
                 </p>

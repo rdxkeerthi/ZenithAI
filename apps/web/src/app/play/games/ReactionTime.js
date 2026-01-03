@@ -43,15 +43,15 @@ export default function ReactionTimeGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-8">
-            <h2 className="text-3xl font-bold mb-4">⚡ Reaction Time Test</h2>
-            <p className="text-muted mb-8">Round {round + 1} of {totalRounds}</p>
+        <div className="h-full flex flex-col items-center justify-center p-8 text-text-primary">
+            <h2 className="text-3xl font-bold mb-4 gradient-text">⚡ Reaction Time Test</h2>
+            <p className="text-text-muted mb-8 font-semibold">Round {round + 1} of {totalRounds}</p>
 
             <div
                 onClick={handleClick}
-                className={`w-full max-w-md h-64 rounded-lg flex items-center justify-center cursor-pointer transition-all ${gameState === 'waiting' ? 'bg-danger' :
-                        gameState === 'active' ? 'bg-success animate-glow' :
-                            'bg-primary'
+                className={`w-full max-w-md h-64 rounded-2xl flex items-center justify-center cursor-pointer transition-all border-2 ${gameState === 'waiting' ? 'bg-danger/20 border-danger text-danger' :
+                        gameState === 'active' ? 'bg-success/20 border-success text-success animate-glow shadow-lg shadow-success/40' :
+                            'bg-primary/20 border-primary text-primary'
                     }`}
             >
                 <div className="text-center">
@@ -72,7 +72,7 @@ export default function ReactionTimeGame({ onComplete }) {
 
             {attempts.length > 0 && (
                 <div className="mt-6 text-center">
-                    <p className="text-sm text-muted">
+                    <p className="text-sm text-text-muted">
                         Average: {(attempts.reduce((a, b) => a + b, 0) / attempts.length).toFixed(0)}ms
                     </p>
                 </div>

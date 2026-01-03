@@ -44,10 +44,10 @@ export default function DashboardPage() {
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <div className="text-xl font-mono text-primary animate-pulse">LOADING SYSTEM...</div>
+                    <div className="text-xl font-semibold text-primary animate-pulse">LOADING SYSTEM...</div>
                 </div>
             </div>
         )
@@ -66,34 +66,34 @@ export default function DashboardPage() {
     const overallStatus = getStressLevel(avgStress)
 
     return (
-        <div className="min-h-screen p-4 md:p-8 relative overflow-hidden">
+        <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)]">
             {/* Ambient Background Glows */}
             <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[100px]"></div>
+                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/8 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/8 rounded-full blur-[100px]"></div>
             </div>
 
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
-                <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 animate-fade-in">
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 animate-fade-in pb-6 border-b border-primary/10">
                     <div>
-                        <div className="text-sm font-mono text-primary mb-1 uppercase tracking-widest opacity-80">Welcome Back</div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+                        <div className="text-sm font-semibold text-primary mb-1 uppercase tracking-widest opacity-80">Welcome Back</div>
+                        <h1 className="text-4xl md:text-5xl font-bold text-primary-dark tracking-tight">
                             {user.name}
                         </h1>
                     </div>
 
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex flex-col items-end mr-4">
-                            <span className="text-xs text-gray-400 uppercase tracking-wider">System Status</span>
-                            <span className="text-green-400 font-mono text-sm flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <span className="text-xs text-text-muted uppercase tracking-wider">System Status</span>
+                            <span className="text-success font-semibold text-sm flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
                                 ONLINE
                             </span>
                         </div>
                         <button
                             onClick={handleLogout}
-                            className="px-6 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition-colors text-gray-300 font-medium text-sm backdrop-blur-sm"
+                            className="btn btn-secondary px-6 py-2.5 rounded-lg border border-primary/15 hover:bg-primary/5 transition-all text-text-primary font-medium text-sm"
                         >
                             Log Out
                         </button>

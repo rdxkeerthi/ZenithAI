@@ -84,11 +84,14 @@ export default function ReportPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)] flex items-center justify-center">
+                <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
+                    <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-50"></div>
+                </div>
                 <div className="text-center">
                     <div className="text-6xl mb-4 animate-pulse">🤖</div>
-                    <div className="text-2xl font-bold mb-2">Analyzing Your Session...</div>
-                    <div className="text-muted">Generating personalized report</div>
+                    <div className="text-2xl font-bold mb-2 text-text-primary">Analyzing Your Session...</div>
+                    <div className="text-text-muted">Generating personalized report</div>
                 </div>
             </div>
         )
@@ -96,11 +99,11 @@ export default function ReportPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center px-4">
-                <div className="card max-w-md text-center">
+            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] flex items-center justify-center px-4">
+                <div className="bg-white rounded-2xl shadow-lg max-w-md w-full text-center p-8 border border-primary/10">
                     <div className="text-6xl mb-4">⚠️</div>
-                    <p className="text-danger text-xl mb-4">{error}</p>
-                    <button onClick={() => router.push('/dashboard')} className="btn btn-primary">
+                    <p className="text-danger text-xl mb-4 font-semibold">{error}</p>
+                    <button onClick={() => router.push('/dashboard')} className="btn btn-primary w-full font-bold rounded-lg">
                         Back to Dashboard
                     </button>
                 </div>
@@ -129,13 +132,16 @@ export default function ReportPage() {
     }
 
     return (
-        <div className="min-h-screen px-4 py-8">
-            <div className="container max-w-5xl">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)] px-4 py-8">
+            <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
+                <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-40"></div>
+            </div>
+            <div className="container max-w-5xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                         <h1 className="text-4xl font-bold gradient-text mb-2">Stress Analysis Report</h1>
-                        <p className="text-muted">
+                        <p className="text-text-muted">
                             Session #{sessionId} • {new Date(report.created_at).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long',
@@ -145,8 +151,8 @@ export default function ReportPage() {
                             })}
                         </p>
                     </div>
-                    <div className="flex gap-3">
-                        <button onClick={downloadPDF} className="btn btn-primary">
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <button onClick={downloadPDF} className="btn btn-primary flex-1 md:flex-none font-bold py-3 rounded-lg shadow-lg hover:shadow-glow">
                             📥 Download PDF
                         </button>
                         <button onClick={() => router.push('/dashboard')} className="btn btn-secondary">

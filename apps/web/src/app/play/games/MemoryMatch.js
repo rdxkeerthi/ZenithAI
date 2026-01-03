@@ -53,18 +53,18 @@ export default function MemoryMatchGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🧠 Memory Match</h2>
-            <p className="text-muted mb-4">Moves: {moves}</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🧠 Memory Match</h2>
+            <p className="text-text-muted mb-4 font-semibold">Moves: {moves}</p>
 
             <div className="grid grid-cols-4 gap-3 max-w-md">
                 {cards.map((card) => (
                     <div
                         key={card.id}
                         onClick={() => handleCardClick(card.id)}
-                        className={`aspect-square rounded-lg flex items-center justify-center text-4xl cursor-pointer transition-all ${flipped.includes(card.id) || matched.includes(card.id)
-                                ? 'bg-primary'
-                                : 'bg-tertiary hover:bg-secondary'
+                        className={`aspect-square rounded-xl flex items-center justify-center text-4xl cursor-pointer transition-all border-2 ${flipped.includes(card.id) || matched.includes(card.id)
+                                ? 'bg-primary/20 border-primary shadow-md shadow-primary/20'
+                                : 'bg-secondary/20 hover:bg-secondary/30 border-secondary hover:border-secondary hover:shadow-md'
                             }`}
                     >
                         {(flipped.includes(card.id) || matched.includes(card.id)) ? card.emoji : '?'}

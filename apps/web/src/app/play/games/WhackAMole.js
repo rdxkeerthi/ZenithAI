@@ -39,18 +39,18 @@ export default function WhackAMoleGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🔨 Whack-a-Mole</h2>
-            <p className="text-muted mb-4">Score: {score} | Time: {timeLeft}s</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🔨 Whack-a-Mole</h2>
+            <p className="text-text-muted mb-4 font-semibold">Score: {score} | Time: {timeLeft}s</p>
 
             <div className="grid grid-cols-3 gap-4 max-w-md">
                 {Array.from({ length: 9 }).map((_, idx) => (
                     <div
                         key={idx}
                         onClick={() => handleHit(idx)}
-                        className={`aspect-square rounded-full flex items-center justify-center text-5xl cursor-pointer transition-all ${idx === activeMole
-                                ? 'bg-warning animate-pulse'
-                                : 'bg-tertiary'
+                        className={`aspect-square rounded-full flex items-center justify-center text-5xl cursor-pointer transition-all border-2 ${idx === activeMole
+                                ? 'bg-warning/30 border-warning animate-pulse shadow-lg shadow-warning/40'
+                                : 'bg-secondary/20 border-secondary/40 hover:border-secondary'
                             }`}
                     >
                         {idx === activeMole && '🐹'}

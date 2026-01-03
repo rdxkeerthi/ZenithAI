@@ -55,13 +55,16 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-8">
-            <div className="card max-w-2xl w-full animate-fade-in">
+        <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)]">
+            <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
+                <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-50"></div>
+            </div>
+            <div className="card max-w-2xl w-full animate-fade-in bg-white shadow-lg border border-primary/10 rounded-2xl">
                 <h1 className="text-3xl font-bold mb-2 gradient-text">Create Your Account</h1>
-                <p className="text-muted mb-6">Join us to start monitoring your stress levels</p>
+                <p className="text-text-secondary mb-6">Join us to start monitoring your stress levels</p>
 
                 {error && (
-                    <div className="bg-danger/20 border border-danger text-danger px-4 py-3 rounded mb-4">
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
                         {error}
                     </div>
                 )}

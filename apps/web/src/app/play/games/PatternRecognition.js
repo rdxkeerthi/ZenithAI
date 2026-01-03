@@ -54,12 +54,12 @@ export default function PatternRecognitionGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🔷 Pattern Recognition</h2>
-            <p className="text-muted mb-4">Round {round + 1} of {totalRounds} | Score: {score}</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🔷 Pattern Recognition</h2>
+            <p className="text-text-muted mb-4 font-semibold">Round {round + 1} of {totalRounds} | Score: {score}</p>
 
             {showPattern && (
-                <p className="text-lg mb-4 text-warning">Memorize the pattern!</p>
+                <p className="text-lg mb-4 text-warning font-bold">Memorize the pattern!</p>
             )}
 
             <div className="grid grid-cols-4 gap-2 max-w-sm">
@@ -67,9 +67,9 @@ export default function PatternRecognitionGame({ onComplete }) {
                     <div
                         key={idx}
                         onClick={() => handleCellClick(idx)}
-                        className={`aspect-square rounded-lg cursor-pointer transition-all ${(showPattern && pattern.includes(idx)) || userPattern.includes(idx)
-                                ? 'bg-primary animate-glow'
-                                : 'bg-tertiary hover:bg-secondary'
+                        className={`aspect-square rounded-xl cursor-pointer transition-all border-2 ${(showPattern && pattern.includes(idx)) || userPattern.includes(idx)
+                                ? 'bg-primary/30 border-primary animate-glow shadow-lg shadow-primary/30'
+                                : 'bg-secondary/20 hover:bg-secondary/30 border-secondary hover:border-primary'
                             }`}
                     />
                 ))}

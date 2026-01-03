@@ -292,7 +292,7 @@ const FaceTracking = forwardRef(({ onStressUpdate }, ref) => {
     }, [])
 
     return (
-        <div className="relative h-[240px] bg-black rounded-lg overflow-hidden">
+        <div className="relative h-[240px] bg-gradient-to-br from-white/50 to-white/30 rounded-xl overflow-hidden border-2 border-primary/20 shadow-lg">
             <video
                 ref={videoRef}
                 className="w-full h-full object-cover"
@@ -306,20 +306,20 @@ const FaceTracking = forwardRef(({ onStressUpdate }, ref) => {
 
             {/* Loading Overlay */}
             {isLoading && !error && (
-                <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-black/80 text-white p-4">
+                <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm text-text-primary p-4">
                     <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
-                    <p className="text-sm">Initializing AI...</p>
+                    <p className="text-sm font-semibold">Initializing AI...</p>
                 </div>
             )}
 
             {/* Error Overlay */}
             {error && (
-                <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-black/90 text-danger p-4 text-center">
+                <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-danger/20 backdrop-blur-sm text-danger p-4 text-center border-2 border-danger/30">
                     <p className="text-2xl mb-2">⚠️</p>
                     <p className="text-sm font-bold">{error}</p>
                     <button
                         onClick={() => startTracking()}
-                        className="mt-2 text-xs bg-primary px-3 py-1 rounded text-white"
+                        className="mt-2 text-xs bg-danger hover:bg-danger/90 px-4 py-2 rounded-lg text-white font-bold transition-all"
                     >
                         Retry
                     </button>
@@ -328,7 +328,7 @@ const FaceTracking = forwardRef(({ onStressUpdate }, ref) => {
 
             {/* Success Indicator */}
             {isTracking && (
-                <div className="absolute top-2 right-2 bg-success/80 backdrop-blur px-2 py-1 rounded text-xs flex items-center gap-1 font-bold">
+                <div className="absolute top-3 right-3 bg-success/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 font-bold text-white shadow-lg border border-success/50">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     Tracking Active
                 </div>

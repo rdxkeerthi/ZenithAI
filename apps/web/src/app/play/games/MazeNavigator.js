@@ -44,10 +44,10 @@ export default function MazeNavigatorGame({ onComplete }) {
     }, [position, moves, startTime, onComplete])
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🗺️ Maze Navigator</h2>
-            <p className="text-muted mb-4">Moves: {moves}</p>
-            <p className="text-sm mb-8">Use arrow keys to reach the goal!</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🗺️ Maze Navigator</h2>
+            <p className="text-text-muted mb-4 font-semibold">Moves: {moves}</p>
+            <p className="text-sm mb-8 text-text-secondary font-medium">Use arrow keys to reach the goal!</p>
 
             <div className="grid grid-cols-5 gap-2 max-w-md">
                 {Array.from({ length: 25 }).map((_, idx) => {
@@ -59,9 +59,9 @@ export default function MazeNavigatorGame({ onComplete }) {
                     return (
                         <div
                             key={idx}
-                            className={`aspect-square rounded-lg flex items-center justify-center text-3xl ${isPlayer ? 'bg-primary' :
-                                    isGoal ? 'bg-success' :
-                                        'bg-tertiary'
+                            className={`aspect-square rounded-xl flex items-center justify-center text-3xl border-2 transition-all ${isPlayer ? 'bg-primary/30 border-primary shadow-lg shadow-primary/40' :
+                                    isGoal ? 'bg-success/30 border-success shadow-lg shadow-success/40' :
+                                        'bg-secondary/20 border-secondary/40 hover:border-secondary'
                                 }`}
                         >
                             {isPlayer && '🚀'}

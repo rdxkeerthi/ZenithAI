@@ -61,18 +61,18 @@ export default function FocusTrackerGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🎯 Focus Tracker</h2>
-            <p className="text-muted mb-4">Score: {score} | Time: {timeLeft}s</p>
-            <p className="text-sm mb-4">Keep your cursor on the target!</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🎯 Focus Tracker</h2>
+            <p className="text-text-muted mb-4 font-semibold">Score: {score} | Time: {timeLeft}s</p>
+            <p className="text-sm mb-4 text-text-secondary font-medium">Keep your cursor on the target!</p>
 
             <div
                 onMouseMove={handleMouseMove}
-                className="relative w-full max-w-lg aspect-square bg-tertiary rounded-lg cursor-none overflow-hidden"
+                className="relative w-full max-w-lg aspect-square bg-secondary/20 rounded-2xl cursor-none overflow-hidden border-2 border-secondary/40 shadow-lg"
             >
                 {/* Target */}
                 <div
-                    className="absolute w-16 h-16 bg-success rounded-full transition-all duration-500"
+                    className="absolute w-16 h-16 bg-success shadow-lg shadow-success/50 rounded-full transition-all duration-500 ring-2 ring-success/30"
                     style={{
                         left: `${targetPosition.x}%`,
                         top: `${targetPosition.y}%`,
@@ -82,7 +82,7 @@ export default function FocusTrackerGame({ onComplete }) {
 
                 {/* Cursor */}
                 <div
-                    className="absolute w-4 h-4 bg-primary rounded-full"
+                    className="absolute w-4 h-4 bg-primary rounded-full shadow-md shadow-primary/40 ring-2 ring-primary/30"
                     style={{
                         left: `${position.x}%`,
                         top: `${position.y}%`,

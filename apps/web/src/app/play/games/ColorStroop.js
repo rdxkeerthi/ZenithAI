@@ -43,12 +43,12 @@ export default function ColorStroopGame({ onComplete }) {
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4">
-            <h2 className="text-3xl font-bold mb-2">🎨 Color Stroop Test</h2>
-            <p className="text-muted mb-4">Round {round + 1} of {totalRounds} | Score: {score}</p>
-            <p className="text-lg mb-8">Select the COLOR of the text, not the word!</p>
+        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
+            <h2 className="text-3xl font-bold mb-2 gradient-text">🎨 Color Stroop Test</h2>
+            <p className="text-text-muted mb-4 font-semibold">Round {round + 1} of {totalRounds} | Score: {score}</p>
+            <p className="text-lg mb-8 text-text-secondary font-medium">Select the COLOR of the text, not the word!</p>
 
-            <div className="mb-12">
+            <div className="mb-12 p-8 bg-white/50 rounded-2xl border-3 border-primary/20">
                 <p
                     className="text-6xl font-bold"
                     style={{ color: currentColor }}
@@ -62,7 +62,7 @@ export default function ColorStroopGame({ onComplete }) {
                     <button
                         key={color.name}
                         onClick={() => handleAnswer(color.name)}
-                        className="btn text-lg py-4"
+                        className="btn text-lg py-4 rounded-xl font-bold border-2 border-white/40 hover:scale-105 transition-transform shadow-md"
                         style={{ backgroundColor: color.color }}
                     >
                         {color.name}
