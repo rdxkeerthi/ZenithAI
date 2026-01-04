@@ -66,21 +66,35 @@ module.exports = {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
                 },
-                "float": {
-                    "0%, 100%": { transform: "translateY(0)" },
-                    "50%": { transform: "translateY(-10px)" },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
                 },
-                "slide-up": {
-                    "0%": { opacity: "0", transform: "translateY(20px)" },
-                    "100%": { opacity: "1", transform: "translateY(0)" },
+                'float-slow': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-20px)' },
                 },
-                "scale-in": {
-                    "0%": { opacity: "0", transform: "scale(0.95)" },
-                    "100%": { opacity: "1", transform: "scale(1)" },
+                'slide-up': {
+                    '0%': { transform: 'translateY(20px)', opacity: '0' },
+                    '100%': { transform: 'translateY(0)', opacity: '1' },
                 },
-                "pulse-slow": {
-                    "0%, 100%": { opacity: "1" },
-                    "50%": { opacity: "0.5" },
+                'scale-in': {
+                    '0%': { transform: 'scale(0.9)', opacity: '0' },
+                    '100%': { transform: 'scale(1)', opacity: '1' },
+                },
+                'pulse-slow': {
+                    '0%, 100%': { opacity: '1' },
+                    '50%': { opacity: '0.7' },
+                },
+                'pulse-glow': {
+                    '0%, 100%': { boxShadow: '0 0 15px rgba(99, 102, 241, 0.5)' },
+                    '50%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.8)' },
+                },
+                blob: {
+                    '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                    '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                    '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                    '100%': { transform: 'translate(0px, 0px) scale(1)' },
                 },
                 "gradient-xy": {
                     "0%, 100%": {
@@ -96,10 +110,13 @@ module.exports = {
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
-                "float": "float 6s ease-in-out infinite",
-                "slide-up": "slide-up 0.5s ease-out forwards",
-                "scale-in": "scale-in 0.3s ease-out forwards",
-                "pulse-slow": "pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                float: 'float 3s ease-in-out infinite',
+                'float-slow': 'float-slow 6s ease-in-out infinite',
+                'slide-up': 'slide-up 0.5s ease-out forwards',
+                'scale-in': 'scale-in 0.3s ease-out forwards',
+                'pulse-slow': 'pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                blob: 'blob 7s infinite',
                 "gradient-xy": "gradient-xy 15s ease infinite",
             },
         },

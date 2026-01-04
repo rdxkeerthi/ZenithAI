@@ -5,7 +5,9 @@ const Card = React.forwardRef(({ className, variant = "default", ...props }, ref
     const variants = {
         default: "rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
         glass: "rounded-xl border border-white/20 bg-white/70 backdrop-blur-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/80 hover:-translate-y-1",
-        vibrant: "rounded-xl border-none bg-gradient-to-br from-white to-indigo-50/50 shadow-md hover:shadow-indigo-200/50 transition-all duration-300 hover:-translate-y-1"
+        vibrant: "rounded-xl border-none bg-gradient-to-br from-white to-indigo-50/50 shadow-md hover:shadow-indigo-200/50 transition-all duration-300 hover:-translate-y-1",
+        neo: "rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] transition-all duration-500 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] hover:-translate-y-1 text-slate-800",
+        translucent: "rounded-2xl border-none bg-white/50 backdrop-blur-sm shadow-sm hover:bg-white/60 transition-colors"
     }
 
     return (

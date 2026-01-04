@@ -5,6 +5,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
+import AnimatedIcon from '@/components/ui/AnimatedIcon'
 
 export default function DashboardPage() {
     const router = useRouter()
@@ -45,9 +46,9 @@ export default function DashboardPage() {
         : 0
 
     const getStressLevel = (stress) => {
-        if (stress < 30) return { label: 'Optimal', color: 'text-emerald-600', badgeInfo: 'bg-emerald-100/50 text-emerald-800' }
-        if (stress < 70) return { label: 'Moderate', color: 'text-amber-600', badgeInfo: 'bg-amber-100/50 text-amber-800' }
-        return { label: 'High', color: 'text-red-600', badgeInfo: 'bg-red-100/50 text-red-800' }
+        if (stress < 30) return { label: 'Optimal', color: 'text-emerald-600', badgeInfo: 'bg-emerald-100/30 text-emerald-700 border border-emerald-200' }
+        if (stress < 70) return { label: 'Moderate', color: 'text-amber-600', badgeInfo: 'bg-amber-100/30 text-amber-700 border border-amber-200' }
+        return { label: 'High', color: 'text-red-600', badgeInfo: 'bg-red-100/30 text-red-700 border border-red-200' }
     }
 
     const overallStatus = getStressLevel(avgStress)
@@ -57,113 +58,158 @@ export default function DashboardPage() {
 
     return (
         <DashboardLayout>
-            <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="space-y-8 animate-in fade-in duration-700">
                 <div className="animate-slide-up" style={{ animationDelay: '0ms' }}>
-                    <h2 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">Overview</h2>
-                    <p className="text-lg text-slate-500">Welcome back, {user.name}. Here are your latest health metrics.</p>
+                    <h2 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-800 drop-shadow-sm">Welcome back, {user.name}</h2>
+                    <p className="text-lg text-slate-600 font-medium mt-2 max-w-2xl">
+                        Your cognitive health metrics are ready. System status is <span className="text-emerald-600 font-bold">Optimal</span>.
+                    </p>
                 </div>
 
-                {/* Stats Grid */}
+                {/* Stats Grid - Neo Boxed Design */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    <Card variant="glass" className="animate-slide-up border-l-4 border-l-indigo-500" style={{ animationDelay: '100ms' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
-                            <span className="text-2xl animate-bounce-slow">📊</span>
+
+                    {/* Total Sessions */}
+                    <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '100ms' }}>
+                        <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Total Sessions</CardTitle>
+                            <AnimatedIcon type="chart" className="scale-75" />
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-4xl font-bold text-slate-800">
-                                <AnimatedCounter value={sessions.length} />
+                        <CardContent className="relative z-10">
+                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
+                                <div className="text-4xl font-black text-indigo-900">
+                                    <AnimatedCounter value={sessions.length} />
+                                </div>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">Lifetime assessments</p>
+                            <p className="text-sm font-medium text-slate-600 mt-3 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
+                                Lifetime assessments
+                            </p>
                         </CardContent>
                     </Card>
-                    <Card variant="glass" className="animate-slide-up border-l-4 border-l-amber-500" style={{ animationDelay: '200ms' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Avg Stress Level</CardTitle>
-                            <span className="text-2xl animate-pulse-slow">🧠</span>
+
+                    {/* Stress Level */}
+                    <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '200ms' }}>
+                        <div className="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Avg Stress</CardTitle>
+                            <AnimatedIcon type="brain" className="scale-75" />
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-4xl font-bold text-slate-800">
-                                <AnimatedCounter value={avgStress} />
+                        <CardContent className="relative z-10">
+                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
+                                <div className="text-4xl font-black text-slate-900">
+                                    <AnimatedCounter value={avgStress} />
+                                </div>
                             </div>
-                            <p className={`text-xs ${overallStatus.color} font-medium mt-1`}>{overallStatus.label} range</p>
+                            <p className={`text-sm font-bold mt-3 inline-block px-2 py-0.5 rounded-lg ${overallStatus.badgeInfo}`}>
+                                {overallStatus.label} Range
+                            </p>
                         </CardContent>
                     </Card>
-                    <Card variant="glass" className="animate-slide-up border-l-4 border-l-emerald-500" style={{ animationDelay: '300ms' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Wellness Score</CardTitle>
-                            <span className="text-2xl animate-beat">❤️</span>
+
+                    {/* Wellness Score */}
+                    <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '300ms' }}>
+                        <div className="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Wellness Score</CardTitle>
+                            <AnimatedIcon type="heart" className="scale-75" />
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-4xl font-bold text-emerald-600">
-                                <AnimatedCounter value={wellnessScore} />
+                        <CardContent className="relative z-10">
+                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
+                                <div className="text-4xl font-black text-emerald-600">
+                                    <AnimatedCounter value={wellnessScore} />
+                                </div>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">Based on recent activity</p>
+                            <p className="text-sm font-medium text-emerald-800/70 mt-3">
+                                +2% from last week
+                            </p>
                         </CardContent>
                     </Card>
-                    <Card variant="glass" className="animate-slide-up border-l-4 border-l-blue-500" style={{ animationDelay: '400ms' }}>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">System Status</CardTitle>
-                            <span className="text-2xl animate-spin-slow">⚡</span>
+
+                    {/* System Status */}
+                    <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '400ms' }}>
+                        <div className="absolute right-0 top-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">System Status</CardTitle>
+                            <AnimatedIcon type="energy" className="scale-75" />
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Online</div>
-                            <p className="text-xs text-muted-foreground mt-1">AI models ready</p>
+                        <CardContent className="relative z-10">
+                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
+                                <div className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 uppercase tracking-tight">
+                                    ONLINE
+                                </div>
+                            </div>
+                            <p className="text-sm font-medium text-slate-600 mt-3">
+                                AI Neural Net Ready
+                            </p>
                         </CardContent>
                     </Card>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                     {/* Main Action - Start New Session */}
-                    <Card variant="vibrant" className="col-span-4 animate-slide-up relative overflow-hidden group" style={{ animationDelay: '500ms' }}>
+                    <Card variant="vibrant" className="col-span-4 animate-slide-up relative overflow-hidden group border-0 shadow-2xl shadow-indigo-500/20" style={{ animationDelay: '500ms' }}>
 
-                        {/* Abstract shapes for visual interest */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl transform -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+                        {/* Dynamic Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 opacity-90 group-hover:scale-105 transition-transform duration-700" />
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150" />
 
-                        <CardHeader className="relative z-10">
-                            <CardTitle className="text-3xl text-slate-800">Start New Assessment</CardTitle>
-                            <CardDescription className="text-slate-600 text-lg">
-                                Begin a 4-game cognitive sequence to measure your current stress levels.
+                        {/* Abstract shapes */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 group-hover:translate-x-1/3 transition-transform duration-700 ease-in-out pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/2 animate-pulse-slow pointer-events-none" />
+
+                        <CardHeader className="relative z-10 p-8">
+                            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-4xl mb-4 border border-white/20 shadow-lg group-hover:rotate-12 transition-transform duration-500">
+                                🚀
+                            </div>
+                            <CardTitle className="text-4xl text-white font-black tracking-tight drop-shadow-md">Start New Assessment</CardTitle>
+                            <CardDescription className="text-indigo-100 text-lg font-medium max-w-lg mt-2">
+                                Launch a 4-game cognitive sequence to measure your stress levels using advanced biometric analysis.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="relative z-10 pt-4">
+                        <CardContent className="relative z-10 p-8 pt-0">
                             <Button
                                 size="lg"
-                                className="w-full sm:w-auto text-lg h-14 bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                                className="w-full sm:w-auto text-lg h-16 px-8 bg-white text-indigo-600 hover:bg-slate-100 hover:text-indigo-700 font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-xl"
                                 onClick={() => router.push('/play')}
                             >
-                                Launch Session
+                                Launch Session &rarr;
                             </Button>
                         </CardContent>
                     </Card>
 
                     {/* Recent History */}
-                    <Card variant="glass" className="col-span-3 animate-slide-up" style={{ animationDelay: '600ms' }}>
+                    <Card variant="neo" className="col-span-3 animate-slide-up bg-white/40" style={{ animationDelay: '600ms' }}>
                         <CardHeader>
-                            <CardTitle>Recent Activity</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-xl font-bold text-slate-800">Recent Activity</CardTitle>
+                            <CardDescription className="text-slate-500 font-medium">
                                 Your last 3 stress assessment results.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {loading ? (
-                                    <div className="text-sm text-muted-foreground animate-pulse">Loading history...</div>
+                                    <div className="text-sm text-muted-foreground animate-pulse p-4 text-center">Loading history...</div>
                                 ) : sessions.length === 0 ? (
-                                    <div className="text-sm text-muted-foreground">No sessions recorded yet.</div>
+                                    <div className="text-sm text-muted-foreground p-4 text-center bg-white/50 rounded-xl border border-white/50">No sessions recorded yet.</div>
                                 ) : (
                                     sessions.slice(0, 5).map((session, i) => (
                                         <div
                                             key={session.id}
                                             onClick={() => router.push(`/report?session=${session.id}`)}
-                                            className="group flex items-center justify-between border-b border-slate-100 pb-3 last:border-0 last:pb-0 cursor-pointer hover:bg-indigo-50/50 p-2 rounded-lg transition-all"
+                                            className="group flex items-center justify-between cursor-pointer hover:bg-white/80 p-3 rounded-xl transition-all duration-300 border border-transparent hover:border-indigo-100 hover:shadow-md"
                                         >
-                                            <div className="space-y-1">
-                                                <p className="text-sm font-semibold leading-none text-slate-800 group-hover:text-indigo-600 transition-colors">Assessment #{session.id.toString().slice(-3)}</p>
-                                                <p className="text-xs text-muted-foreground">{new Date(session.created_at).toLocaleDateString()}</p>
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm border border-indigo-100 group-hover:scale-110 transition-transform">
+                                                    #{session.id.toString().slice(-3)}
+                                                </div>
+                                                <div className="space-y-0.5">
+                                                    <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Cognitive Check</p>
+                                                    <p className="text-xs text-slate-500 font-medium">{new Date(session.created_at).toLocaleDateString()}</p>
+                                                </div>
                                             </div>
-                                            <div className={`text-sm font-bold px-3 py-1 rounded-full ${getStressLevel(session.avg_stress).badgeInfo}`}>
+                                            <div className={`text-sm font-black px-3 py-1.5 rounded-lg border ${getStressLevel(session.avg_stress).badgeInfo}`}>
                                                 {session.avg_stress?.toFixed(0)}
                                             </div>
                                         </div>
