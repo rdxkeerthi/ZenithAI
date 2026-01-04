@@ -1,86 +1,134 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 
 export default function BreathingExerciseGame({ onComplete }) {
     const [phase, setPhase] = useState('intro') // intro, playing, complete
     const [cycle, setCycle] = useState(0)
     const [breathState, setBreathState] = useState('idle') // inhale, hold, exhale, idle
-    const [timer, setTimer] = useState(0)
     const [instruction, setInstruction] = useState('')
 
-    // Configuration: 4-7-8 Technique (modified for pacing)
-    // 4s Inhale, 4s Hold, 4s Exhale
+    // Configuration: 4-4-4 Technique
     const CYCLES_TO_COMPLETE = 3
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCount(prev => {
-                if (prev <= 1) {
-                    // Move to next phase
-                    if (phase === 'inhale') {
-                        setPhase('hold')
-                        return 4
-                    } else if (phase === 'hold') {
-                        setPhase('exhale')
-                        return 4
-                    } else {
-                        // Complete cycle
-                        const newCycles = cycles + 1
-                        setCycles(newCycles)
+        let mounted = true
 
-                        if (newCycles >= totalCycles) {
-                            clearInterval(interval)
-                            const duration = (Date.now() - startTime) / 1000
-                            onComplete({ score: 100, duration })
-                            return 0
-                        }
+        const runLoop = async () => {
+            if (phase !== 'playing') return
 
-                        setPhase('inhale')
-                        return 4
+            // Loop for cycles
+            while (mounted && phase === 'playing' && cycle < CYCLES_TO_COMPLETE) {
+                // Inhale (4s)
+                setBreathState('inhale')
+                setInstruction('Inhale deeply...')
+                await new Promise(r => setTimeout(r, 4000))
+                if (!mounted || phase !== 'playing') break
+
+                // Hold (4s)
+                setBreathState('hold')
+                setInstruction('Hold your breath...')
+                await new Promise(r => setTimeout(r, 4000))
+                if (!mounted || phase !== 'playing') break
+
+                // Exhale (4s)
+                setBreathState('exhale')
+                setInstruction('Exhale slowly...')
+                await new Promise(r => setTimeout(r, 4000))
+                if (!mounted || phase !== 'playing') break
+
+                setCycle(c => {
+                    const newCycle = c + 1
+                    if (newCycle >= CYCLES_TO_COMPLETE) {
+                        setPhase('complete')
+                        onComplete({ score: 100, duration: 40 })
                     }
-                }
-                return prev - 1
-            })
-        }, 1000)
-
-        return () => clearInterval(interval)
-    }, [phase, cycles, startTime, onComplete])
-
-    const getCircleSize = () => {
-        if (phase === 'inhale') {
-            return 200 + (4 - count) * 50
-        } else if (phase === 'exhale') {
-            return 200 + count * 50
+                    return newCycle
+                })
+            }
         }
-        return 400
+
+        if (phase === 'playing') {
+            runLoop()
+        }
+
+        return () => { mounted = false }
+    }, [phase])
+
+
+    const startGame = () => {
+        setPhase('playing')
+        setCycle(0)
+    }
+
+    // Dynamic styles for the breathing circle
+    const getCircleStyle = () => {
+        switch (breathState) {
+            case 'inhale': return 'scale-150 bg-indigo-500/20 border-indigo-500 transition-all duration-[4000ms] ease-out'
+            case 'hold': return 'scale-150 bg-indigo-500/40 border-indigo-600 transition-all duration-300'
+            case 'exhale': return 'scale-100 bg-indigo-500/10 border-indigo-300 transition-all duration-[4000ms] ease-in-out'
+            default: return 'scale-100'
+        }
+    }
+
+    if (phase === 'intro') {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 h-full text-center space-y-6">
+                <div className="text-6xl animate-bounce">🧘</div>
+                <h2 className="text-3xl font-bold text-slate-800">Breathing Alignment</h2>
+                <p className="text-slate-500 max-w-md">
+                    Synchronize your breath to reduce stress. Follow the circle: Inhale as it expands, hold when it stops, and exhale as it shrinks.
+                </p>
+                <Button onClick={startGame} size="lg" className="w-48">START EXERCISE</Button>
+            </div>
+        )
+    }
+
+    if (phase === 'complete') {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 h-full text-center space-y-6 animate-in fade-in">
+                <div className="text-6xl">✨</div>
+                <h2 className="text-2xl font-bold text-slate-800">Aligned & Calm</h2>
+                <p className="text-slate-500">Great job. Assessment complete.</p>
+            </div>
+        )
     }
 
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
-            <h2 className="text-3xl font-bold mb-2 gradient-text">🧘 Breathing Exercise</h2>
-            <p className="text-text-muted mb-8 font-semibold">Cycle {cycles + 1} of {totalCycles}</p>
+        <div className="flex flex-col items-center justify-center h-full relative overflow-hidden bg-slate-50/50">
+            {/* Ambient Background Glows */}
+            <div className={cn(
+                "absolute inset-0 bg-gradient-to-b from-indigo-50/0 via-indigo-50/50 to-indigo-50/0 transition-opacity duration-1000",
+                breathState === 'inhale' ? 'opacity-100' : 'opacity-30'
+            )} />
 
-            <div className="relative w-full max-w-md aspect-square flex items-center justify-center mb-8">
-                <div
-                    className="rounded-full bg-gradient-to-br from-primary/40 via-secondary/30 to-primary/40 transition-all duration-1000 flex items-center justify-center shadow-lg shadow-primary/20"
-                    style={{
-                        width: `${getCircleSize()}px`,
-                        height: `${getCircleSize()}px`
-                    }}
-                >
-                    <div className="text-center">
-                        <p className="text-4xl font-bold mb-2 text-primary">{count}</p>
-                        <p className="text-2xl uppercase text-primary font-bold">{phase}</p>
+            <div className="relative z-10 flex flex-col items-center gap-12">
+                <div className="text-center space-y-2">
+                    <h3 className="text-2xl font-bold text-slate-700 transition-all duration-500">{instruction}</h3>
+                    <p className="text-sm text-slate-400 font-mono">Cycle {Math.min(cycle + 1, CYCLES_TO_COMPLETE)}/{CYCLES_TO_COMPLETE}</p>
+                </div>
+
+                {/* Breathing Circle Container */}
+                <div className="relative w-64 h-64 flex items-center justify-center">
+                    {/* Outer Rings */}
+                    <div className={cn(
+                        "absolute inset-0 rounded-full border-2",
+                        breathState === 'inhale' ? "border-indigo-200 animate-ping opacity-20" : "border-transparent"
+                    )} />
+
+                    {/* Main Circle */}
+                    <div className={cn(
+                        "w-40 h-40 rounded-full border-4 flex items-center justify-center shadow-lg backdrop-blur-sm",
+                        getCircleStyle()
+                    )}>
+                        <div className="text-indigo-600 font-medium text-lg">
+                            {breathState === 'inhale' && 'Inhale'}
+                            {breathState === 'hold' && 'Hold'}
+                            {breathState === 'exhale' && 'Exhale'}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="text-center text-text-muted">
-                <p className="font-medium">Follow the breathing pattern</p>
-                <p className="text-sm mt-2 text-text-secondary">Inhale → Hold → Exhale</p>
             </div>
         </div>
     )
