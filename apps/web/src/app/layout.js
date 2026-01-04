@@ -1,22 +1,22 @@
 import '../styles/globals.css'
+import { Inter } from 'next/font/google'
+import { cn } from '@/lib/utils'
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
 export const metadata = {
-    title: 'AI Stress Monitor - Advanced Stress Detection',
-    description: 'Real-time stress monitoring through facial expression analysis during interactive gameplay',
+    title: 'ZenithMind AI - Enterprise Stress Analytics',
+    description: 'Advanced real-time stress monitoring and analytics platform for enterprise environments.',
 }
 
 export default function RootLayout({ children }) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <head>
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-            </head>
-            <body suppressHydrationWarning>
-                <div className="min-h-screen">
-                    {children}
-                </div>
+            <body className={cn(
+                "min-h-screen bg-background font-sans antialiased",
+                inter.variable
+            )} suppressHydrationWarning>
+                {children}
             </body>
         </html>
     )

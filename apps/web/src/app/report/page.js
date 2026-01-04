@@ -1,8 +1,12 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { DashboardLayout } from '@/components/layout/DashboardLayout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { cn } from '@/lib/utils'
 
-export default function ReportPage() {
+function ReportContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const sessionId = searchParams.get('session')
@@ -17,7 +21,6 @@ export default function ReportPage() {
             router.push('/dashboard')
             return
         }
-
         fetchReport()
     }, [sessionId, router])
 
@@ -82,35 +85,6 @@ export default function ReportPage() {
         }
     }
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)] flex items-center justify-center">
-                <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
-                    <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-50"></div>
-                </div>
-                <div className="text-center">
-                    <div className="text-6xl mb-4 animate-pulse">🤖</div>
-                    <div className="text-2xl font-bold mb-2 text-text-primary">Analyzing Your Session...</div>
-                    <div className="text-text-muted">Generating personalized report</div>
-                </div>
-            </div>
-        )
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] flex items-center justify-center px-4">
-                <div className="bg-white rounded-2xl shadow-lg max-w-md w-full text-center p-8 border border-primary/10">
-                    <div className="text-6xl mb-4">⚠️</div>
-                    <p className="text-danger text-xl mb-4 font-semibold">{error}</p>
-                    <button onClick={() => router.push('/dashboard')} className="btn btn-primary w-full font-bold rounded-lg">
-                        Back to Dashboard
-                    </button>
-                </div>
-            </div>
-        )
-    }
-
     const parseJSON = (str) => {
         try {
             return JSON.parse(str)
@@ -120,230 +94,163 @@ export default function ReportPage() {
     }
 
     const getStressColor = (level) => {
-        if (level === 'Low') return 'text-success'
-        if (level === 'Medium') return 'text-warning'
-        return 'text-danger'
+        if (level === 'Low') return 'text-emerald-600 bg-emerald-100'
+        if (level === 'Medium') return 'text-amber-600 bg-amber-100'
+        return 'text-red-600 bg-red-100'
     }
 
-    const getTrendIcon = (trend) => {
-        if (trend === 'Increasing') return '📈'
-        if (trend === 'Decreasing') return '📉'
-        return '➡️'
+    if (loading) {
+        return (
+            <div className="flex h-full items-center justify-center min-h-[50vh]">
+                <div className="text-center space-y-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
+                    <p className="text-muted-foreground">Generating comprehensive report...</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="flex bg-red-50 p-4 rounded-md text-red-900 items-center justify-between">
+                <div>
+                    <h3 className="font-bold">Error Loading Report</h3>
+                    <p>{error}</p>
+                </div>
+                <Button onClick={() => router.push('/dashboard')} variant="destructive">Return to Dashboard</Button>
+            </div>
+        )
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[var(--bg-primary)] via-white to-[var(--bg-secondary)] px-4 py-8">
-            <div className="absolute inset-0 flex justify-center items-center pointer-events-none -z-10">
-                <div className="w-[1000px] h-[700px] bg-gradient-to-br from-primary/8 to-secondary/8 rounded-full blur-[150px] opacity-40"></div>
+        <div className="space-y-6 max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b pb-6">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-primary">Stress Analysis Report</h1>
+                    <p className="text-muted-foreground">
+                        Session #{sessionId} • {new Date(report.created_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </p>
+                </div>
+                <div className="flex gap-2">
+                    <Button onClick={downloadPDF} variant="outline">
+                        Download PDF
+                    </Button>
+                    <Button onClick={() => router.push('/dashboard')}>
+                        Return to Dashboard
+                    </Button>
+                </div>
             </div>
-            <div className="container max-w-5xl mx-auto">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                        <h1 className="text-4xl font-bold gradient-text mb-2">Stress Analysis Report</h1>
-                        <p className="text-text-muted">
-                            Session #{sessionId} • {new Date(report.created_at).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}
+
+            {/* Overall Assessment */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Overall Assessment</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground mb-1">Stress Score</p>
+                        <p className="text-4xl font-bold text-primary">{report.overall_stress.toFixed(1)}</p>
+                        <p className="text-xs text-muted-foreground">/ 100</p>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground mb-1">Stress Level</p>
+                        <span className={cn("px-3 py-1 rounded-full text-sm font-semibold inline-block my-2", getStressColor(report.stress_level))}>
+                            {report.stress_level}
+                        </span>
+                    </div>
+                    <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground mb-1">Trend</p>
+                        <p className="text-2xl font-semibold my-2">
+                            {report.stress_trend === 'Increasing' ? '📈 Increasing' :
+                                report.stress_trend === 'Decreasing' ? '📉 Decreasing' : '➡️ Stable'}
                         </p>
                     </div>
-                    <div className="flex gap-3 w-full md:w-auto">
-                        <button onClick={downloadPDF} className="btn btn-primary flex-1 md:flex-none font-bold py-3 rounded-lg shadow-lg hover:shadow-glow">
-                            📥 Download PDF
-                        </button>
-                        <button onClick={() => router.push('/dashboard')} className="btn btn-secondary">
-                            Dashboard
-                        </button>
-                    </div>
-                </div>
+                </CardContent>
+            </Card>
 
-                {/* Overall Stress Assessment */}
-                <div className="card mb-8">
-                    <h2 className="text-2xl font-bold mb-6 text-center">Overall Stress Assessment</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="text-center p-6 bg-tertiary rounded-lg">
-                            <div className="text-sm text-muted mb-2">Stress Score</div>
-                            <div className="text-6xl font-bold gradient-text mb-2">
-                                {report.overall_stress.toFixed(1)}
-                            </div>
-                            <div className="text-sm text-muted">out of 100</div>
-                        </div>
-
-                        <div className="text-center p-6 bg-tertiary rounded-lg">
-                            <div className="text-sm text-muted mb-2">Stress Level</div>
-                            <div className={`text-4xl font-bold mb-2 ${getStressColor(report.stress_level)}`}>
-                                {report.stress_level}
-                            </div>
-                            <div className={`px-4 py-2 rounded-full inline-block ${report.stress_level === 'Low' ? 'bg-success/20 text-success' :
-                                    report.stress_level === 'Medium' ? 'bg-warning/20 text-warning' :
-                                        'bg-danger/20 text-danger'
-                                }`}>
-                                {report.stress_level === 'Low' ? '😌 Relaxed' :
-                                    report.stress_level === 'Medium' ? '😐 Moderate' :
-                                        '😰 Elevated'}
-                            </div>
-                        </div>
-
-                        <div className="text-center p-6 bg-tertiary rounded-lg">
-                            <div className="text-sm text-muted mb-2">Trend</div>
-                            <div className="text-5xl mb-2">{getTrendIcon(report.stress_trend)}</div>
-                            <div className="text-2xl font-bold">{report.stress_trend}</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Session Details */}
-                {sessionData && sessionData.games && sessionData.games.length > 0 && (
-                    <div className="card mb-8">
-                        <h2 className="text-2xl font-bold mb-6">Session Performance</h2>
+            {/* Game Performance */}
+            {sessionData?.games?.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Session Performance</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <div className="space-y-4">
                             {sessionData.games.map((game, idx) => (
-                                <div key={idx} className="p-4 bg-tertiary rounded-lg">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <div className="font-bold text-lg">
-                                            Game {game.game_number}: {game.game_name}
-                                        </div>
-                                        <div className="text-sm text-muted">
-                                            {game.duration.toFixed(1)}s
-                                        </div>
+                                <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <div className="mb-2 sm:mb-0">
+                                        <p className="font-semibold">{game.game_name}</p>
+                                        <p className="text-xs text-muted-foreground">Duration: {game.duration.toFixed(1)}s</p>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-4 text-sm">
-                                        <div>
-                                            <span className="text-muted">Score:</span>{' '}
-                                            <span className="font-bold">{game.score.toFixed(0)}</span>
+                                    <div className="grid grid-cols-3 gap-8 text-sm">
+                                        <div className="text-center">
+                                            <p className="text-muted-foreground text-xs">Score</p>
+                                            <p className="font-medium">{game.score.toFixed(0)}</p>
                                         </div>
-                                        <div>
-                                            <span className="text-muted">Avg Stress:</span>{' '}
-                                            <span className={`font-bold ${game.avg_stress < 30 ? 'text-success' :
-                                                    game.avg_stress < 70 ? 'text-warning' :
-                                                        'text-danger'
-                                                }`}>{game.avg_stress.toFixed(1)}</span>
+                                        <div className="text-center">
+                                            <p className="text-muted-foreground text-xs">Avg Stress</p>
+                                            <p className="font-medium">{game.avg_stress.toFixed(1)}</p>
                                         </div>
-                                        <div>
-                                            <span className="text-muted">Peak:</span>{' '}
-                                            <span className="font-bold text-danger">{game.max_stress.toFixed(1)}</span>
+                                        <div className="text-center">
+                                            <p className="text-muted-foreground text-xs">Peak</p>
+                                            <p className="font-medium">{game.max_stress.toFixed(1)}</p>
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </div>
-                )}
+                    </CardContent>
+                </Card>
+            )}
 
-                {/* Recommendations Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {/* Activities */}
-                    <div className="card">
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <span className="text-3xl">🌳</span>
-                            Recommended Activities
-                        </h3>
-                        <ul className="space-y-3">
-                            {parseJSON(report.activities).map((activity, idx) => (
-                                <li key={idx} className="flex items-start gap-3 p-3 bg-tertiary rounded-lg hover:bg-secondary transition-colors">
-                                    <span className="text-primary text-xl">•</span>
-                                    <span className="flex-1">{activity}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+            {/* Recommendations */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <RecommendationCard title="Recommended Activities" icon="🌳" items={parseJSON(report.activities)} />
+                <RecommendationCard title="Workout Plan" icon="💪" items={parseJSON(report.workouts)} />
+                <RecommendationCard title="Meditation" icon="🧘" items={parseJSON(report.meditation)} />
+                <RecommendationCard title="Nutrition" icon="🥗" items={parseJSON(report.food_control)} />
+            </div>
 
-                    {/* Workouts */}
-                    <div className="card">
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <span className="text-3xl">💪</span>
-                            Workout Plan
-                        </h3>
-                        <ul className="space-y-3">
-                            {parseJSON(report.workouts).map((workout, idx) => (
-                                <li key={idx} className="flex items-start gap-3 p-3 bg-tertiary rounded-lg hover:bg-secondary transition-colors">
-                                    <span className="text-primary text-xl">•</span>
-                                    <span className="flex-1">{workout}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Meditation */}
-                    <div className="card">
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <span className="text-3xl">🧘</span>
-                            Meditation & Mindfulness
-                        </h3>
-                        <ul className="space-y-3">
-                            {parseJSON(report.meditation).map((item, idx) => (
-                                <li key={idx} className="flex items-start gap-3 p-3 bg-tertiary rounded-lg hover:bg-secondary transition-colors">
-                                    <span className="text-primary text-xl">•</span>
-                                    <span className="flex-1">{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Nutrition */}
-                    <div className="card">
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                            <span className="text-3xl">🥗</span>
-                            Nutrition Guidelines
-                        </h3>
-                        <ul className="space-y-3">
-                            {parseJSON(report.food_control).map((item, idx) => (
-                                <li key={idx} className="flex items-start gap-3 p-3 bg-tertiary rounded-lg hover:bg-secondary transition-colors">
-                                    <span className="text-primary text-xl">•</span>
-                                    <span className="flex-1">{item}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-
-                {/* Medical Recommendations */}
-                <div className="card mb-8">
-                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                        <span className="text-3xl">⚕️</span>
-                        Medical Recommendations
-                    </h3>
-                    <ul className="space-y-3">
-                        {parseJSON(report.medical_checkup).map((item, idx) => (
-                            <li key={idx} className="flex items-start gap-3 p-3 bg-tertiary rounded-lg">
-                                <span className="text-primary text-xl">•</span>
-                                <span className="flex-1">{item}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Disclaimer */}
-                <div className="card bg-warning/10 border border-warning">
-                    <div className="flex items-start gap-3">
-                        <span className="text-2xl">⚠️</span>
-                        <div>
-                            <p className="font-bold mb-2">Important Disclaimer</p>
-                            <p className="text-sm">
-                                This report is generated by AI based on facial expression analysis and should not replace professional medical advice.
-                                If you're experiencing persistent stress or mental health concerns, please consult with qualified healthcare professionals.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                    <button onClick={() => router.push('/play')} className="btn btn-primary">
-                        🎮 Start New Session
-                    </button>
-                    <button onClick={downloadPDF} className="btn btn-secondary">
-                        📥 Download PDF Report
-                    </button>
-                    <button onClick={() => router.push('/dashboard')} className="btn">
-                        📊 View Dashboard
-                    </button>
-                </div>
+            <div className="p-4 bg-yellow-50 text-yellow-900 rounded-lg border border-yellow-200 text-sm">
+                <strong>Disclaimer:</strong> This report is AI-generated based on facial analysis. It is not a medical diagnosis. Please consult a healthcare professional for medical advice.
             </div>
         </div>
+    )
+}
+
+function RecommendationCard({ title, icon, items }) {
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+                <span className="text-xl">{icon}</span>
+                <CardTitle className="text-lg">{title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ul className="space-y-2 text-sm">
+                    {items.map((item, idx) => (
+                        <li key={idx} className="flex gap-2 items-start">
+                            <span className="text-primary mt-0.5">•</span>
+                            <span className="text-muted-foreground">{item}</span>
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </Card>
+    )
+}
+
+export default function ReportPage() {
+    return (
+        <DashboardLayout>
+            <Suspense fallback={<div>Loading Report...</div>}>
+                <ReportContent />
+            </Suspense>
+        </DashboardLayout>
     )
 }
