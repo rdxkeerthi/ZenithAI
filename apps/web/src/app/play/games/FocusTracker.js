@@ -1,95 +1,190 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Button } from '@/components/ui/Button'
+import { cn } from '@/lib/utils'
 
 export default function FocusTrackerGame({ onComplete }) {
-    const [position, setPosition] = useState({ x: 50, y: 50 })
-    const [targetPosition, setTargetPosition] = useState({ x: 50, y: 50 })
-    const [score, setScore] = useState(100)
-    const [timeLeft, setTimeLeft] = useState(20)
-    const [startTime] = useState(Date.now())
+    const [gameState, setGameState] = useState('intro') // intro, playing, complete
+    const [position, setPosition] = useState({ x: 50, y: 50 }) // User cursor
+    const [target, setTarget] = useState({ x: 50, y: 50 }) // Moving target
+    const [score, setScore] = useState(0)
+    const [timeLeft, setTimeLeft] = useState(30) // 30 seconds game
+    const [isInside, setIsInside] = useState(false)
 
-    useEffect(() => {
-        // Move target randomly
-        const targetInterval = setInterval(() => {
-            setTargetPosition({
-                x: 20 + Math.random() * 60,
-                y: 20 + Math.random() * 60
-            })
-        }, 2000)
+    // Game loop ref
+    const requestRef = useRef()
+    const startTimeRef = useRef()
+    const lastScoreTimeRef = useRef(0)
 
-        // Timer
-        const timerInterval = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev <= 1) {
-                    clearInterval(targetInterval)
-                    clearInterval(timerInterval)
-                    const duration = (Date.now() - startTime) / 1000
-                    onComplete({ score: Math.max(0, score), duration })
-                    return 0
-                }
-                return prev - 1
-            })
-        }, 1000)
+    const startGame = () => {
+        setGameState('playing')
+        setScore(0)
+        setTimeLeft(30)
+        startLoop()
+    }
 
-        return () => {
-            clearInterval(targetInterval)
-            clearInterval(timerInterval)
+    const startLoop = () => {
+        startTimeRef.current = Date.now()
+        lastScoreTimeRef.current = Date.now()
+        requestRef.current = requestAnimationFrame(animate)
+    }
+
+    const animate = (time) => {
+        const now = Date.now()
+        const elapsed = (now - startTimeRef.current) / 1000
+
+        // Timer logic
+        const remaining = Math.max(0, 30 - elapsed)
+        setTimeLeft(remaining)
+
+        if (remaining <= 0) {
+            setGameState('complete')
+            cancelAnimationFrame(requestRef.current)
+            finishGame()
+            return
         }
-    }, [score, startTime, onComplete])
+
+        // Move target in a figure-8 or smooth random path
+        // Using sine waves for smooth continuous movement
+        const speed = 0.5 + (elapsed / 10) // Speed up over time
+        const tx = 50 + 35 * Math.sin(now * 0.001 * speed) * Math.cos(now * 0.0005)
+        const ty = 50 + 35 * Math.sin(now * 0.0015 * speed)
+
+        setTarget({ x: tx, y: ty })
+
+        // Check if cursor (position) is inside target
+        // Distance check (percentage based)
+        // Assume target radius is approx 10% of container width
+        // Assume Aspect Ratio is roughly square for calculation simplicity or handle separately
+        const dx = position.x - tx
+        const dy = position.y - ty
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        const threshold = 10 // 10% radius
+        const inside = dist < threshold
+        setIsInside(inside)
+
+        // Score accumulation (every 100ms effectively)
+        if (inside && now - lastScoreTimeRef.current > 100) {
+            setScore(prev => prev + 10)
+            lastScoreTimeRef.current = now
+        }
+
+        requestRef.current = requestAnimationFrame(animate)
+    }
+
+    const finishGame = () => {
+        // Normalize score: 3000 max points approx (30s * 10pts/0.1s)
+        // Let's say 2500 is 100%
+        const finalScore = Math.min(100, Math.floor((score / 2500) * 100))
+
+        setTimeout(() => {
+            onComplete({
+                score: finalScore,
+                duration: 30
+            })
+        }, 1500)
+    }
 
     useEffect(() => {
-        // Calculate distance and update score
-        const interval = setInterval(() => {
-            const distance = Math.sqrt(
-                Math.pow(position.x - targetPosition.x, 2) +
-                Math.pow(position.y - targetPosition.y, 2)
-            )
-
-            if (distance > 10) {
-                setScore(prev => Math.max(0, prev - 1))
-            }
-        }, 100)
-
-        return () => clearInterval(interval)
-    }, [position, targetPosition])
+        return () => cancelAnimationFrame(requestRef.current)
+    }, [])
 
     const handleMouseMove = (e) => {
+        if (gameState !== 'playing') return
         const rect = e.currentTarget.getBoundingClientRect()
         const x = ((e.clientX - rect.left) / rect.width) * 100
         const y = ((e.clientY - rect.top) / rect.height) * 100
         setPosition({ x, y })
     }
 
+    if (gameState === 'intro') {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 h-full text-center space-y-6">
+                <div className="text-6xl text-indigo-500">🎯</div>
+                <h2 className="text-3xl font-bold text-slate-800">Precision Pursuit</h2>
+                <p className="text-slate-500 max-w-md">
+                    Keep your cursor inside the moving circle as it accelerates. Do not let it escape.
+                </p>
+                <Button onClick={startGame} size="lg" className="w-48">START TRACKING</Button>
+            </div>
+        )
+    }
+
+    if (gameState === 'complete') {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 animate-in fade-in">
+                <h2 className="text-2xl font-bold text-slate-800">Tracking Complete</h2>
+                <div className="text-4xl font-mono font-bold text-indigo-600">{Math.min(100, Math.floor((score / 2500) * 100))} pts</div>
+                <p className="text-slate-500">Focus Stability Score</p>
+            </div>
+        )
+    }
+
     return (
-        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
-            <h2 className="text-3xl font-bold mb-2 gradient-text">🎯 Focus Tracker</h2>
-            <p className="text-text-muted mb-4 font-semibold">Score: {score} | Time: {timeLeft}s</p>
-            <p className="text-sm mb-4 text-text-secondary font-medium">Keep your cursor on the target!</p>
+        <div className="h-full flex flex-col items-center justify-center p-4">
+            <div className="mb-6 flex justify-between w-full max-w-lg text-sm font-medium text-slate-400 uppercase tracking-wider">
+                <div className="flex flex-col">
+                    <span className="text-xs">Time Remaining</span>
+                    <span className={cn("text-xl font-bold font-mono", timeLeft < 5 ? "text-red-500" : "text-slate-700")}>
+                        {timeLeft.toFixed(1)}s
+                    </span>
+                </div>
+                <div className="flex flex-col text-right">
+                    <span className="text-xs">Score</span>
+                    <span className="text-xl font-bold text-indigo-600">{score}</span>
+                </div>
+            </div>
 
             <div
+                className="relative w-full max-w-lg aspect-square bg-slate-50 rounded-3xl border-2 border-slate-200 shadow-inner overflow-hidden cursor-none"
                 onMouseMove={handleMouseMove}
-                className="relative w-full max-w-lg aspect-square bg-secondary/20 rounded-2xl cursor-none overflow-hidden border-2 border-secondary/40 shadow-lg"
             >
-                {/* Target */}
-                <div
-                    className="absolute w-16 h-16 bg-success shadow-lg shadow-success/50 rounded-full transition-all duration-500 ring-2 ring-success/30"
-                    style={{
-                        left: `${targetPosition.x}%`,
-                        top: `${targetPosition.y}%`,
-                        transform: 'translate(-50%, -50%)'
-                    }}
+                {/* Grid/Guides Background */}
+                <div className="absolute inset-0 opacity-10"
+                    style={{ backgroundImage: 'radial-gradient(#6366f1 1px, transparent 1px)', backgroundSize: '10% 10%' }}
                 />
 
-                {/* Cursor */}
+                {/* Target Zone */}
                 <div
-                    className="absolute w-4 h-4 bg-primary rounded-full shadow-md shadow-primary/40 ring-2 ring-primary/30"
-                    style={{
-                        left: `${position.x}%`,
-                        top: `${position.y}%`,
-                        transform: 'translate(-50%, -50%)'
-                    }}
+                    className={cn(
+                        "absolute w-20 h-20 rounded-full border-4 transition-colors duration-75 flex items-center justify-center shadow-lg transform -translate-x-1/2 -translate-y-1/2",
+                        isInside
+                            ? "bg-emerald-500/20 border-emerald-500 shadow-emerald-200"
+                            : "bg-indigo-500/10 border-indigo-400"
+                    )}
+                    style={{ left: `${target.x}%`, top: `${target.y}%` }}
+                >
+                    <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        isInside ? "bg-emerald-500 animate-ping" : "bg-indigo-400"
+                    )} />
+                </div>
+
+                {/* User Cursor */}
+                <div
+                    className={cn(
+                        "absolute w-6 h-6 rounded-full border-2 transform -translate-x-1/2 -translate-y-1/2 transition-colors duration-75 pointer-events-none z-10",
+                        isInside ? "bg-emerald-600 border-white shadow-lg" : "bg-slate-800 border-white shadow-md"
+                    )}
+                    style={{ left: `${position.x}%`, top: `${position.y}%` }}
                 />
+
+                {/* Connect Line (Visual Aid) */}
+                <svg className="absolute inset-0 pointer-events-none opacity-30">
+                    <line
+                        x1={`${position.x}%`} y1={`${position.y}%`}
+                        x2={`${target.x}%`} y2={`${target.y}%`}
+                        stroke={isInside ? "#10b981" : "#64748b"}
+                        strokeWidth="2"
+                        strokeDasharray="4 4"
+                    />
+                </svg>
             </div>
+
+            <p className="mt-6 text-sm text-slate-400">
+                Keep the dark dot inside the large circle.
+            </p>
         </div>
     )
 }

@@ -1,12 +1,19 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { cn } from '@/lib/utils'
 
 export default function BreathingExerciseGame({ onComplete }) {
-    const [phase, setPhase] = useState('inhale') // inhale, hold, exhale
-    const [count, setCount] = useState(4)
-    const [cycles, setCycles] = useState(0)
-    const [startTime] = useState(Date.now())
-    const totalCycles = 5
+    const [phase, setPhase] = useState('intro') // intro, playing, complete
+    const [cycle, setCycle] = useState(0)
+    const [breathState, setBreathState] = useState('idle') // inhale, hold, exhale, idle
+    const [timer, setTimer] = useState(0)
+    const [instruction, setInstruction] = useState('')
+
+    // Configuration: 4-7-8 Technique (modified for pacing)
+    // 4s Inhale, 4s Hold, 4s Exhale
+    const CYCLES_TO_COMPLETE = 3
 
     useEffect(() => {
         const interval = setInterval(() => {

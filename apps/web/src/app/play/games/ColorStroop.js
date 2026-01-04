@@ -1,5 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/Button'
+import { cn } from '@/lib/utils'
 
 const COLORS = [
     { name: 'RED', color: '#ef4444' },
@@ -9,16 +11,21 @@ const COLORS = [
 ]
 
 export default function ColorStroopGame({ onComplete }) {
+    const [gameState, setGameState] = useState('intro') // intro, playing, complete
     const [currentWord, setCurrentWord] = useState(null)
     const [currentColor, setCurrentColor] = useState(null)
     const [score, setScore] = useState(0)
     const [round, setRound] = useState(0)
-    const [startTime] = useState(Date.now())
-    const totalRounds = 10
+    const [startTime, setStartTime] = useState(null)
+    const TOTAL_ROUNDS = 10
 
-    useEffect(() => {
+    const startGame = () => {
+        setGameState('playing')
+        setScore(0)
+        setRound(0)
+        setStartTime(Date.now())
         generateNew()
-    }, [])
+    }
 
     const generateNew = () => {
         const wordIdx = Math.floor(Math.random() * COLORS.length)
@@ -30,39 +37,70 @@ export default function ColorStroopGame({ onComplete }) {
     const handleAnswer = (colorName) => {
         const correctColor = COLORS.find(c => c.color === currentColor)
         if (colorName === correctColor.name) {
-            setScore(score + 10)
+            setScore(s => s + 10)
         }
 
-        if (round < totalRounds - 1) {
-            setRound(round + 1)
+        if (round < TOTAL_ROUNDS - 1) {
+            setRound(r => r + 1)
             generateNew()
         } else {
-            const duration = (Date.now() - startTime) / 1000
-            onComplete({ score, duration })
+            finishGame()
         }
     }
 
-    return (
-        <div className="h-full flex flex-col items-center justify-center p-4 text-text-primary">
-            <h2 className="text-3xl font-bold mb-2 gradient-text">🎨 Color Stroop Test</h2>
-            <p className="text-text-muted mb-4 font-semibold">Round {round + 1} of {totalRounds} | Score: {score}</p>
-            <p className="text-lg mb-8 text-text-secondary font-medium">Select the COLOR of the text, not the word!</p>
+    const finishGame = () => {
+        setGameState('complete')
+        const duration = (Date.now() - startTime) / 1000
+        setTimeout(() => {
+            onComplete({ score, duration })
+        }, 1500)
+    }
 
-            <div className="mb-12 p-8 bg-white/50 rounded-2xl border-3 border-primary/20">
+    if (gameState === 'intro') {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 h-full text-center space-y-6">
+                <div className="text-6xl text-indigo-500">🎨</div>
+                <h2 className="text-3xl font-bold text-slate-800">Color Conflict</h2>
+                <p className="text-slate-500 max-w-md">
+                    Stroop Effect Test. Select the <strong>COLOR</strong> of the text, not the word itself. Ignore the semantic meaning.
+                </p>
+                <Button onClick={startGame} size="lg" className="w-48">START TEST</Button>
+            </div>
+        )
+    }
+
+    if (gameState === 'complete') {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 animate-in fade-in">
+                <h2 className="text-2xl font-bold text-slate-800">Cognitive Load Test</h2>
+                <div className="text-4xl font-mono font-bold text-indigo-600">{score}/100</div>
+                <p className="text-slate-500">Accuracy Score</p>
+            </div>
+        )
+    }
+
+    return (
+        <div className="h-full flex flex-col items-center justify-center p-4">
+            <div className="mb-8 flex justify-between w-full max-w-md text-sm font-medium text-slate-400 uppercase tracking-wider">
+                <span>Round {round + 1}/{TOTAL_ROUNDS}</span>
+                <span>Score: {score}</span>
+            </div>
+
+            <div className="mb-12 p-12 bg-white rounded-3xl border-2 border-slate-100 shadow-xl w-full max-w-md flex items-center justify-center">
                 <p
-                    className="text-6xl font-bold"
+                    className="text-6xl font-black tracking-widest"
                     style={{ color: currentColor }}
                 >
                     {currentWord}
                 </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 max-w-md">
+            <div className="grid grid-cols-2 gap-4 max-w-md w-full">
                 {COLORS.map((color) => (
                     <button
                         key={color.name}
                         onClick={() => handleAnswer(color.name)}
-                        className="btn text-lg py-4 rounded-xl font-bold border-2 border-white/40 hover:scale-105 transition-transform shadow-md"
+                        className="btn h-20 rounded-2xl font-bold text-white text-xl shadow-lg hover:scale-105 active:scale-95 transition-all border-b-4 border-black/10"
                         style={{ backgroundColor: color.color }}
                     >
                         {color.name}
