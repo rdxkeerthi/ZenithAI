@@ -58,6 +58,7 @@ function ReportContent() {
                 setReport(data)
             } else {
                 const data = await generateResponse.json()
+                console.log('Report generated:', data.overall_stress)
                 setReport(data)
             }
         } catch (err) {
@@ -130,13 +131,13 @@ function ReportContent() {
     return (
         <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-700">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 pb-6 border-b border-indigo-100">
+            <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 pb-6 border-b border-indigo-500/30">
                 <div className="space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100/50 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-indigo-200">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border border-indigo-500/30">
                         Confidential Report
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight text-slate-900">Stress Analysis Report</h1>
-                    <p className="text-slate-500 font-medium text-lg">
+                    <h1 className="text-4xl font-black tracking-tight text-white">Stress Analysis Report</h1>
+                    <p className="text-slate-400 font-medium text-lg">
                         Session #{sessionId} • {new Date(report.created_at).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -147,10 +148,10 @@ function ReportContent() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <Button onClick={downloadPDF} variant="outline" className="border-indigo-200 hover:bg-indigo-50 text-indigo-700">
+                    <Button onClick={downloadPDF} variant="outline" className="border-indigo-500/50 hover:bg-indigo-500/20 text-indigo-300">
                         Download PDF
                     </Button>
-                    <Button onClick={() => router.push('/dashboard')} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200">
+                    <Button onClick={() => router.push('/dashboard')} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/50">
                         Dashboard
                     </Button>
                 </div>
@@ -161,32 +162,35 @@ function ReportContent() {
                 <Card variant="neo" className="lg:col-span-2 overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full blur-3xl pointer-events-none" />
                     <CardHeader>
-                        <CardTitle className="text-xl font-bold text-slate-700">Overall Assessment</CardTitle>
+                        <CardTitle className="text-xl font-bold text-white">Overall Assessment</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-3 gap-8 relative z-10">
-                        <div className="flex flex-col items-center justify-center p-4 bg-white/50 rounded-2xl border border-white/60 shadow-sm text-center">
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Stress Score</p>
-                            <div className="text-5xl font-black text-indigo-600 mb-2">
-                                <AnimatedCounter value={report.overall_stress} />
+                        <div className="flex flex-col items-center justify-center p-4 bg-white/10 rounded-2xl border border-white/20 shadow-sm text-center overflow-hidden">
+                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Stress Score</p>
+                            <div className="text-5xl font-black text-indigo-400 mb-2 w-full truncate px-2" title={report.overall_stress}>
+                                <AnimatedCounter
+                                    key={`score-${Math.min(100, Number(report.overall_stress) || 0)}`}
+                                    value={Math.min(100, Number(report.overall_stress) || 0)}
+                                />
                             </div>
-                            <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div className="w-full bg-slate-700 h-2 rounded-full overflow-hidden flex-shrink-0">
                                 <div
                                     className="h-full bg-indigo-500 transition-all duration-1000"
-                                    style={{ width: `${report.overall_stress}%` }}
+                                    style={{ width: `${Math.min(100, Number(report.overall_stress))}%` }}
                                 />
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center p-4 bg-white/50 rounded-2xl border border-white/60 shadow-sm text-center">
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Stress Level</p>
+                        <div className="flex flex-col items-center justify-center p-4 bg-white/10 rounded-2xl border border-white/20 shadow-sm text-center">
+                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Stress Level</p>
                             <span className={cn("px-4 py-2 rounded-xl text-lg font-bold border-2 shadow-sm inline-block my-2", getStressColor(report.stress_level))}>
                                 {report.stress_level}
                             </span>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center p-4 bg-white/50 rounded-2xl border border-white/60 shadow-sm text-center">
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Trend</p>
-                            <div className="text-3xl font-bold my-2 bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">
+                        <div className="flex flex-col items-center justify-center p-4 bg-white/10 rounded-2xl border border-white/20 shadow-sm text-center">
+                            <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Trend</p>
+                            <div className="text-3xl font-bold my-2 bg-clip-text text-transparent bg-gradient-to-r from-slate-200 to-slate-400">
                                 {report.stress_trend === 'Increasing' ? '📈 Rising' :
                                     report.stress_trend === 'Decreasing' ? '📉 Falling' : '➡️ Stable'}
                             </div>
@@ -214,14 +218,14 @@ function ReportContent() {
 
             {/* Game Performance */}
             {sessionData?.games?.length > 0 && (
-                <Card variant="glass" className="overflow-hidden">
-                    <CardHeader className="bg-white/40 border-b border-indigo-50">
-                        <CardTitle className="text-lg font-bold text-slate-700">Detailed Performance Metrics</CardTitle>
+                <Card variant="neo" className="overflow-hidden">
+                    <CardHeader className="bg-white/5 border-b border-white/10">
+                        <CardTitle className="text-lg font-bold text-slate-200">Detailed Performance Metrics</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-indigo-50/50 text-slate-500 text-xs font-bold uppercase tracking-wider text-left">
+                                <thead className="bg-white/5 text-slate-400 text-xs font-bold uppercase tracking-wider text-left">
                                     <tr>
                                         <th className="p-4">Activity</th>
                                         <th className="p-4">Duration</th>
@@ -230,22 +234,22 @@ function ReportContent() {
                                         <th className="p-4">Peak Stress</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-indigo-50">
+                                <tbody className="divide-y divide-white/10">
                                     {sessionData.games.map((game, idx) => (
-                                        <tr key={idx} className="hover:bg-indigo-50/30 transition-colors">
-                                            <td className="p-4 font-bold text-slate-800">{game.game_name}</td>
-                                            <td className="p-4 text-slate-600 font-mono">{game.duration.toFixed(1)}s</td>
-                                            <td className="p-4 font-bold text-indigo-600">{game.score.toFixed(0)}</td>
+                                        <tr key={idx} className="hover:bg-white/5 transition-colors text-slate-300">
+                                            <td className="p-4 font-bold text-white">{game.game_name}</td>
+                                            <td className="p-4 text-slate-400 font-mono">{game.duration.toFixed(1)}s</td>
+                                            <td className="p-4 font-bold text-indigo-400">{game.score.toFixed(0)}</td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="h-2 w-16 bg-slate-200 rounded-full overflow-hidden">
+                                                    <div className="h-2 w-16 bg-slate-700 rounded-full overflow-hidden">
                                                         <div className="h-full bg-amber-500" style={{ width: `${game.avg_stress}%` }} />
                                                     </div>
                                                     <span className="text-xs font-medium">{game.avg_stress.toFixed(0)}</span>
                                                 </div>
                                             </td>
                                             <td className="p-4">
-                                                <span className="text-xs font-medium text-slate-500">{game.max_stress.toFixed(0)}</span>
+                                                <span className="text-xs font-medium text-slate-400">{game.max_stress.toFixed(0)}</span>
                                             </td>
                                         </tr>
                                     ))}
@@ -258,7 +262,7 @@ function ReportContent() {
 
             {/* Recommendations Grid */}
             <div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                     <span className="text-3xl text-emerald-500">✨</span> Personalized Recommendations
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -269,7 +273,7 @@ function ReportContent() {
                 </div>
             </div>
 
-            <div className="p-4 bg-amber-50 text-amber-900 rounded-xl border border-amber-200 text-sm font-medium flex items-start gap-3">
+            <div className="p-4 bg-amber-950/30 text-amber-200 rounded-xl border border-amber-500/30 text-sm font-medium flex items-start gap-3">
                 <span className="text-xl">⚠️</span>
                 <span><strong>Disclaimer:</strong> This report is AI-generated based on facial analysis. It is not a medical diagnosis. Please consult a healthcare professional for medical advice.</span>
             </div>
@@ -289,17 +293,17 @@ function RecommendationCard({ title, icon, items, delay }) {
     return (
         <Card variant="neo" className="animate-slide-up hover:scale-[1.02] transition-transform duration-300" style={{ animationDelay: delay }}>
             <CardHeader className="flex flex-row items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-xl shadow-sm border border-indigo-100">
+                <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl shadow-sm border border-indigo-500/30">
                     {getIcon()}
                 </div>
-                <CardTitle className="text-lg font-bold text-slate-800">{title}</CardTitle>
+                <CardTitle className="text-lg font-bold text-slate-200">{title}</CardTitle>
             </CardHeader>
             <CardContent>
                 <ul className="space-y-3">
                     {items.map((item, idx) => (
-                        <li key={idx} className="flex gap-3 items-start p-3 rounded-lg hover:bg-white/50 transition-colors">
+                        <li key={idx} className="flex gap-3 items-start p-3 rounded-lg hover:bg-white/5 transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0"></span>
-                            <span className="text-slate-600 font-medium text-sm leading-relaxed">{item}</span>
+                            <span className="text-slate-400 font-medium text-sm leading-relaxed">{item}</span>
                         </li>
                     ))}
                 </ul>

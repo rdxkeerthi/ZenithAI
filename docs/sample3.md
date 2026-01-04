@@ -88,35 +88,34 @@ graph TD
     classDef database fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20;
     classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#e65100;
 
-    subgraph Client_Side["User Workstation"]
+    subgraph Client_Side [🖥️ User Workstation]
         direction TB
         User((User)):::client
-        Browser["Web Browser / Next.js Client"]:::client
-        Webcam["Webcam Device"]:::external
+        Browser[Web Browser / Next.js Client]:::client
+        Webcam[Webcam Device]:::external
     end
 
-    subgraph Cloud_Infrastructure["ZenithMind Cloud"]
+    subgraph Cloud_Infrastructure [☁️ ZenithMind Cloud]
         direction TB
-        LB["Load Balancer / CDN"]:::server
-        API["FastAPI Application Cluster"]:::server
-        Worker["Celery Async Workers"]:::server
+        LB[Load Balancer / CDN]:::server
+        API[FastAPI Application Cluster]:::server
+        Worker[Celery Aysnc Workers]:::server
     end
 
-    subgraph Data_Persistence["Data Layer"]
-        direction TB
-        DB["TimescaleDB Primary"]:::database
-        Cache["Redis Session Cache"]:::database
-        S3["Object Storage Reports"]:::database
+    subgraph Data_Persistence [💾 Data Layer]
+        DB[(TimescaleDB Primary)]:::database
+        Cache[(Redis Session Cache)]:::database
+        S3[Object Storage / Reports]:::database
     end
 
     User -->|Visual Input| Webcam
-    Webcam -->|Video Stream| Browser
-    Browser -->|JSON Telemetry| LB
+    Webcam -->|Video Stream (Edge Process)| Browser
+    Browser -->|JSON Telemetry (HTTPS/WSS)| LB
     LB --> API
-    API -->|Read Write| DB
+    API -->|Read/Write| DB
     API -->|Session State| Cache
     API -->|Async Tasks| Worker
-    Worker -->|Store Reports| S3
+    Worker -->|Store PDF| S3
 ```
 
 ## High-Level Architecture
@@ -243,83 +242,63 @@ graph TD
     classDef process fill:#b2ebf2,stroke:#0097a7;
     classDef output fill:#ffecb3,stroke:#ff6f00;
 
-    Frame["Input Webcam Frame"]:::input
-    FaceMesh["MediaPipe Face Mesh"]:::process
-    Landmarks["468 Facial Landmarks"]:::process
-
-    subgraph Feature_Engineering["Feature Engineering Layer"]
-        EAR["Eye Aspect Ratio"]:::process
-        MAR["Mouth Aspect Ratio"]:::process
-        Head["Head Pose Estimation"]:::process
+    Frame[Input Webcam Frame]:::input
+    FaceMesh[MediaPipe Face Mesh]:::process
+    Landmarks[468 3D Landmarks]:::process
+    
+    subgraph Feature_Engineering [Feature Engineering Layer]
+        EAR[Eye Aspect Ratio (Blink)]:::process
+        MAR[Mouth Aspect Ratio (Yawn)]:::process
+        Head[Head Pose (Tilt/Yaw)]:::process
     end
-
-    Normalizer["Z Score Normalization"]:::process
-    Classifier["Random Forest Classifier"]:::process
-    Score["Stress Probability"]:::output
-    FinalScale["Stress Score 0 to 100"]:::output
+    
+    Normalizer[Z-Score Normalization]:::process
+    Classifier[Random Forest Classifier]:::process
+    Score[Stress Probability (0-1.0)]:::output
+    FinalScale[Rescale to 0-100]:::output
 
     Frame --> FaceMesh
     FaceMesh --> Landmarks
     Landmarks --> EAR
     Landmarks --> MAR
     Landmarks --> Head
-
-    EAR --> Normalizer
-    MAR --> Normalizer
-    Head --> Normalizer
-
+    
+    EAR & MAR & Head --> Normalizer
     Normalizer --> Classifier
     Classifier --> Score
     Score --> FinalScale
-
 ```
 
 ## Project Structure
 
 ```mermaid
 graph TD
-    %% Style Definitions
-    classDef root fill:#ffccbc,stroke:#d84315,stroke-width:2px,color:#3e2723;
-    classDef folder fill:#ffe0b2,stroke:#f57c00,stroke-width:2px,color:#4e342e;
-    classDef file fill:#f5f5f5,stroke:#9e9e9e,color:#212121;
+    classDef folder fill:#ffe0b2,stroke:#f57c00;
+    classDef file fill:#f5f5f5,stroke:#9e9e9e;
 
-    Root["ai-stress-app"]:::root
-    Apps["apps"]:::folder
-    Web["web frontend"]:::folder
-    API["api backend"]:::folder
-
+    Root[ai-stress-app/]:::folder
+    Apps[apps/]:::folder
+    Web[web (Next.js)]:::folder
+    API[api (FastAPI)]:::folder
+    
     Root --> Apps
     Apps --> Web
     Apps --> API
-
-    %% Frontend Structure
-    subgraph Frontend_Structure["Frontend Structure"]
-        Src["src"]:::folder
-        AppDir["app routes"]:::folder
-        Comp["components ui"]:::folder
-        Hooks["hooks logic"]:::folder
-        Lib["lib utilities"]:::folder
-
-        Web --> Src
-        Src --> AppDir
-        Src --> Comp
-        Src --> Hooks
-        Src --> Lib
+    
+    subgraph Frontend_Structure
+        Web --> Src[src/]:::folder
+        Src --> App[app/ (Routes)]:::folder
+        Src --> Comp[components/ (UI)]:::folder
+        Src --> Hooks[hooks/ (Logic)]:::folder
+        Src --> Lib[lib/ (Utils)]:::folder
     end
-
-    %% Backend Structure
-    subgraph Backend_Structure["Backend Structure"]
-        Main["main.py"]:::file
-        Svc["services"]:::folder
-        Core["core config"]:::folder
-        ML["ml models"]:::folder
-        Routers["routers endpoints"]:::folder
-
-        API --> Main
-        API --> Svc
-        API --> Core
-        API --> ML
-        API --> Routers
+    
+    subgraph Backend_Structure
+        API --> Main[main.py]:::file
+        API --> Svc[services/]:::folder
+        API --> Core[core/ (Config)]:::folder
+        API --> ML[ml/ (Models)]:::folder
+        API --> Routers[routers/ (Endpts)]:::folder
     end
 ```
 
@@ -600,38 +579,20 @@ graph TD
 
 ## Gallery
 
-![alt text](docs/image.png)
+*Dashboard Interface showing real-time metrics*
+![Dashboard Placeholder](https://via.placeholder.com/800x450.png?text=ZenithMind+Dashboard)
 
+*Real-time AI Analysis Overlay*
+![Analysis Placeholder](https://via.placeholder.com/800x450.png?text=Real-time+AI+Analysis)
 
-![alt text](docs/image2.png)
-
-![alt text](docs/image3.png)
-
-![alt text](docs/image4.png)
-
-![alt text](docs/image5.png)
-
-![alt text](docs/image6.png)
-
-![alt text](docs/image7.png)
-
-![alt text](docs/image8.png)
-
-
-
-[Download the full PDF here](docs/stress_report_39_2026-01-04.pdf)
-
-
-
-
-
-
+*Comprehensive PDF Report*
+![Report Placeholder](https://via.placeholder.com/800x450.png?text=Comprehensive+Report)
 
 ## Installation
 
 ```bash
-git clone https://github.com/rdxkeerthi/ZenithAI.git
-cd ZenithAI
+git clone https://github.com/zenithmind/platform.git
+cd zenithmind
 ./run.sh
 ```
 
@@ -649,4 +610,6 @@ cd ZenithAI
 MIT License.
 
 ## Acknowledgments
+*   OpenAI
 *   Google MediaPipe
+*   Vercel

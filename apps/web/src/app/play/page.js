@@ -214,29 +214,29 @@ export default function PlayPage() {
 
     if (gameState === 'intro') {
         return (
-            <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
-                <div className="fixed inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
-                <Card variant="glass" className="max-w-2xl w-full border-white/40 shadow-2xl backdrop-blur-xl animate-scale-in">
-                    <CardHeader className="text-center pb-8 border-b border-indigo-50/50">
-                        <div className="mx-auto w-24 h-24 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-3xl flex items-center justify-center text-5xl mb-6 shadow-xl shadow-indigo-200 animate-float">
+            <div className="min-h-screen mesh-bg flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-grid-white/[0.05] [mask-image:linear-gradient(0deg,transparent,black)] pointer-events-none" />
+                <Card variant="glass" className="max-w-2xl w-full border-white/10 bg-black/40 shadow-2xl backdrop-blur-xl animate-scale-in">
+                    <CardHeader className="text-center pb-8 border-b border-white/10">
+                        <div className="mx-auto w-24 h-24 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-3xl flex items-center justify-center text-5xl mb-6 shadow-xl shadow-indigo-500/30 animate-float">
                             🧠
                         </div>
-                        <CardTitle className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 mb-2">Cognitive Stress Assessment</CardTitle>
-                        <p className="text-slate-600 text-lg max-w-lg mx-auto leading-relaxed">
+                        <CardTitle className="text-4xl font-extrabold text-white mb-2">Cognitive Stress Assessment</CardTitle>
+                        <p className="text-slate-300 text-lg max-w-lg mx-auto leading-relaxed">
                             Evaluate your mental performance and stress response through 4 rapid-fire cognitive challenges.
                         </p>
                     </CardHeader>
                     <CardContent className="pt-8 flex flex-col gap-8">
                         <div className="grid grid-cols-2 gap-6">
-                            <div className="bg-white/50 p-6 rounded-2xl border border-white/60 shadow-sm text-center transform transition-all hover:scale-105">
+                            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg text-center transform transition-all hover:scale-105 hover:bg-white/10">
                                 <div className="text-4xl mb-3">📷</div>
-                                <div className="font-bold text-slate-800 text-lg">Facial Analysis</div>
-                                <div className="text-sm text-slate-500">Real-time expression tracking</div>
+                                <div className="font-bold text-white text-lg">Facial Analysis</div>
+                                <div className="text-sm text-slate-400">Real-time expression tracking</div>
                             </div>
-                            <div className="bg-white/50 p-6 rounded-2xl border border-white/60 shadow-sm text-center transform transition-all hover:scale-105">
+                            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 shadow-lg text-center transform transition-all hover:scale-105 hover:bg-white/10">
                                 <div className="text-4xl mb-3">🎮</div>
-                                <div className="font-bold text-slate-800 text-lg">4 Mini-Games</div>
-                                <div className="text-sm text-slate-500">Memory, Focus, & Reaction</div>
+                                <div className="font-bold text-white text-lg">4 Mini-Games</div>
+                                <div className="text-sm text-slate-400">Memory, Focus, & Reaction</div>
                             </div>
                         </div>
 
@@ -244,11 +244,11 @@ export default function PlayPage() {
                             size="lg"
                             onClick={startSession}
                             disabled={loading}
-                            className="w-full text-xl h-16 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all rounded-xl"
+                            className="w-full text-xl h-16 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 shadow-xl shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all rounded-xl border border-white/10"
                         >
                             {loading ? 'Initializing Environment...' : 'Start Assessment Session'}
                         </Button>
-                        <p className="text-center text-xs text-slate-400 font-medium tracking-wide uppercas">
+                        <p className="text-center text-xs text-slate-500 font-medium tracking-wide uppercas">
                             Grant camera access when prompted • Results processed locally
                         </p>
                     </CardContent>
@@ -260,61 +260,60 @@ export default function PlayPage() {
     const ActiveGame = selectedGames[currentGameIndex]?.component
 
     return (
-        <div className="h-screen w-screen bg-slate-50 overflow-hidden p-4 md:p-6 lg:p-8 flex gap-6 relative">
-            <div className="fixed inset-0 bg-indigo-50/20 pointer-events-none z-0" />
-
+        <div className="h-screen w-screen mesh-bg overflow-hidden p-4 md:p-6 lg:p-8 flex gap-6 relative text-slate-200">
             {/* LEFT COLUMN: GAME AREA */}
             <div className="flex-1 flex flex-col h-full gap-6 relative z-10">
 
                 {/* Header / Progress */}
-                <div className="flex justify-between items-center bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-white/50 animate-slide-up">
+                <div className="flex justify-between items-center bg-black/40 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/5 animate-slide-up">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center text-2xl shadow-lg">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/20">
                             {selectedGames[currentGameIndex]?.emoji}
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">{selectedGames[currentGameIndex]?.name}</h2>
-                            <p className="text-sm text-slate-500">{selectedGames[currentGameIndex]?.description}</p>
+                            <h2 className="text-xl font-bold text-white">{selectedGames[currentGameIndex]?.name}</h2>
+                            <p className="text-sm text-slate-400">{selectedGames[currentGameIndex]?.description}</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-4 bg-slate-100/50 p-2 rounded-xl">
+                    <div className="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/5">
                         <div className="flex gap-2">
                             {selectedGames.map((_, i) => (
                                 <div
                                     key={i}
                                     className={cn(
                                         "w-3 h-3 rounded-full transition-all duration-300",
-                                        i === currentGameIndex ? "bg-indigo-600 scale-125 shadow-glow" :
-                                            i < currentGameIndex ? "bg-emerald-500" : "bg-slate-300"
+                                        i === currentGameIndex ? "bg-indigo-500 scale-125 shadow-glow" :
+                                            i < currentGameIndex ? "bg-emerald-500" : "bg-white/20"
                                     )}
                                 />
                             ))}
                         </div>
-                        <span className="text-xs font-bold font-mono text-slate-400 uppercase tracking-widest pl-2 border-l border-slate-300">
+                        <span className="text-xs font-bold font-mono text-slate-500 uppercase tracking-widest pl-2 border-l border-white/10">
                             Step {currentGameIndex + 1}/4
                         </span>
                     </div>
                 </div>
 
                 {/* GAME CONTAINER */}
-                <div className="flex-1 relative bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-white/50 overflow-hidden flex flex-col animate-scale-in" style={{ animationDelay: '100ms' }}>
+                <div className="flex-1 relative bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col animate-scale-in" style={{ animationDelay: '100ms' }}>
                     {gameState === 'playing' && ActiveGame && (
                         <div className="flex-1 flex flex-col">
+                            {/* Pass a theme prop or wrap in context if games need to adjust colors, but for most we assume they inherit text color or use their own */}
                             <ActiveGame onComplete={handleGameComplete} />
                         </div>
                     )}
 
                     {gameState === 'transition' && (
-                        <div className="absolute inset-0 z-20 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
-                            <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-green-500 text-white rounded-full flex items-center justify-center text-5xl mb-6 shadow-2xl shadow-emerald-200 animate-bounce-slow">
+                        <div className="absolute inset-0 z-20 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-300">
+                            <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-green-500 text-white rounded-full flex items-center justify-center text-5xl mb-6 shadow-2xl shadow-emerald-500/40 animate-bounce-slow">
                                 ✓
                             </div>
-                            <h2 className="text-3xl font-extrabold text-slate-800 mb-2">Task Completed!</h2>
-                            <p className="text-slate-500 text-lg mb-8">Take a deep breath...</p>
+                            <h2 className="text-3xl font-extrabold text-white mb-2">Task Completed!</h2>
+                            <p className="text-slate-400 text-lg mb-8">Take a deep breath...</p>
                             <Button
                                 onClick={proceedToNextGame}
                                 size="lg"
-                                className="w-56 h-14 text-lg bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 hover:scale-105 transition-all"
+                                className="w-56 h-14 text-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl hover:scale-105 transition-all outline-none border-none"
                             >
                                 Next Challenge →
                             </Button>
@@ -322,10 +321,10 @@ export default function PlayPage() {
                     )}
 
                     {gameState === 'saving' && (
-                        <div className="absolute inset-0 z-30 bg-white/60 backdrop-blur-sm flex items-center justify-center">
-                            <div className="bg-white p-6 rounded-2xl shadow-2xl flex items-center gap-4 border border-indigo-100 animate-float">
-                                <div className="w-6 h-6 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                                <span className="font-bold text-lg text-slate-700">Analyzing Performance...</span>
+                        <div className="absolute inset-0 z-30 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                            <div className="bg-black/80 p-6 rounded-2xl shadow-2xl flex items-center gap-4 border border-indigo-500/50 animate-float text-white">
+                                <div className="w-6 h-6 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                                <span className="font-bold text-lg">Analyzing Performance...</span>
                             </div>
                         </div>
                     )}
@@ -336,8 +335,8 @@ export default function PlayPage() {
             <div className="w-[360px] flex flex-col gap-6 relative z-10 animate-slide-up" style={{ animationDelay: '200ms' }}>
 
                 {/* Camera Feed */}
-                <Card className="overflow-hidden border-none shadow-xl rounded-2xl bg-slate-900">
-                    <CardHeader className="p-4 bg-slate-900/50 backdrop-blur-md border-b border-white/10 flex flex-row justify-between items-center absolute top-0 left-0 right-0 z-10">
+                <Card className="overflow-hidden border-none shadow-xl rounded-2xl bg-black/60 border border-white/10">
+                    <CardHeader className="p-4 bg-black/60 backdrop-blur-md border-b border-white/10 flex flex-row justify-between items-center absolute top-0 left-0 right-0 z-10">
                         <span className="text-xs font-bold text-white/80 uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                             Live Bio-Metrics
@@ -349,15 +348,15 @@ export default function PlayPage() {
                 </Card>
 
                 {/* Real-time Stress Graph */}
-                <Card variant="glass" className="flex-1 flex flex-col border-white/60 shadow-lg">
-                    <CardHeader className="p-5 border-b border-indigo-50">
-                        <CardTitle className="text-sm font-bold text-slate-600 flex justify-between items-center">
+                <Card variant="neo" className="flex-1 flex flex-col border-white/10 shadow-lg bg-black/20">
+                    <CardHeader className="p-5 border-b border-white/10">
+                        <CardTitle className="text-sm font-bold text-slate-400 flex justify-between items-center">
                             <span className="uppercase tracking-wider">Stress Index</span>
                             <span className={cn(
                                 "text-3xl font-black transition-colors duration-500",
-                                !currentStress ? "text-slate-300" :
-                                    currentStress < 40 ? "text-emerald-500" :
-                                        currentStress < 70 ? "text-amber-500" : "text-rose-500"
+                                !currentStress ? "text-slate-600" :
+                                    currentStress < 40 ? "text-emerald-400" :
+                                        currentStress < 70 ? "text-amber-400" : "text-rose-500"
                             )}>
                                 {currentStress ? Math.round(currentStress) : '--'}
                             </span>
@@ -368,19 +367,19 @@ export default function PlayPage() {
                             <Line data={chartData} options={chartOptions} />
                         </div>
                         {/* Overlay gradient for depth */}
-                        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-none shadow-xl shadow-indigo-300 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-125 transition-transform duration-700" />
+                <Card className="bg-gradient-to-br from-indigo-900 to-violet-900 text-white border border-white/10 shadow-xl shadow-indigo-900/50 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:scale-125 transition-transform duration-700" />
                     <CardContent className="p-6 relative z-10">
-                        <div className="text-xs opacity-70 mb-2 uppercase tracking-widest font-bold">Session Status</div>
-                        <div className="font-bold text-xl mb-4">High-Precision Recording</div>
+                        <div className="text-xs opacity-70 mb-2 uppercase tracking-widest font-bold text-indigo-200">Session Status</div>
+                        <div className="font-bold text-xl mb-4 text-white">High-Precision Recording</div>
                         <div className="flex flex-wrap gap-2">
-                            <span className="px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-xs font-semibold transition-colors cursor-default">👀 Gaze Tracking</span>
-                            <span className="px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-xs font-semibold transition-colors cursor-default">⚡ Response Time</span>
-                            <span className="px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-xs font-semibold transition-colors cursor-default">🧠 Focus Load</span>
+                            <span className="px-3 py-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-xs font-semibold transition-colors cursor-default border border-white/5">👀 Gaze Tracking</span>
+                            <span className="px-3 py-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-xs font-semibold transition-colors cursor-default border border-white/5">⚡ Response Time</span>
+                            <span className="px-3 py-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-xs font-semibold transition-colors cursor-default border border-white/5">🧠 Focus Load</span>
                         </div>
                     </CardContent>
                 </Card>

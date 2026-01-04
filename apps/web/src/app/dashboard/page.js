@@ -25,6 +25,13 @@ export default function DashboardPage() {
         const parsedUser = JSON.parse(userData)
         setUser(parsedUser)
         fetchSessions(parsedUser.id)
+
+        // Real-time polling every 3 seconds
+        const interval = setInterval(() => {
+            fetchSessions(parsedUser.id)
+        }, 3000)
+
+        return () => clearInterval(interval)
     }, [router])
 
     const fetchSessions = async (userId) => {
@@ -32,6 +39,11 @@ export default function DashboardPage() {
             const response = await fetch(`http://localhost:8000/api/v1/stress/user/${userId}/history`)
             if (response.ok) {
                 const data = await response.json()
+                // Only update if length changed to prevent unnecessary re-renders causing jitter, 
+                // or just update always for simple values. 
+                // Since we want realtime updates of new sessions, let's just set it.
+                // Comparing length might be a simple optimization but let's just set it for now 
+                // to ensure avgStress updates too.
                 setSessions(data)
             }
         } catch (error) {
@@ -41,14 +53,15 @@ export default function DashboardPage() {
         }
     }
 
+    // Fix: Ensure numbers are parsed to prevent string concatenation
     const avgStress = sessions.length > 0
-        ? sessions.reduce((sum, s) => sum + (s.avg_stress || 0), 0) / sessions.length
+        ? sessions.reduce((sum, s) => sum + (Number(s.avg_stress) || 0), 0) / sessions.length
         : 0
 
     const getStressLevel = (stress) => {
-        if (stress < 30) return { label: 'Optimal', color: 'text-emerald-600', badgeInfo: 'bg-emerald-100/30 text-emerald-700 border border-emerald-200' }
-        if (stress < 70) return { label: 'Moderate', color: 'text-amber-600', badgeInfo: 'bg-amber-100/30 text-amber-700 border border-amber-200' }
-        return { label: 'High', color: 'text-red-600', badgeInfo: 'bg-red-100/30 text-red-700 border border-red-200' }
+        if (stress < 30) return { label: 'Optimal', color: 'text-emerald-400', badgeInfo: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' }
+        if (stress < 70) return { label: 'Moderate', color: 'text-amber-400', badgeInfo: 'bg-amber-500/20 text-amber-300 border border-amber-500/30' }
+        return { label: 'High', color: 'text-red-400', badgeInfo: 'bg-red-500/20 text-red-300 border border-red-500/30' }
     }
 
     const overallStatus = getStressLevel(avgStress)
@@ -60,9 +73,9 @@ export default function DashboardPage() {
         <DashboardLayout>
             <div className="space-y-8 animate-in fade-in duration-700">
                 <div className="animate-slide-up" style={{ animationDelay: '0ms' }}>
-                    <h2 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-800 drop-shadow-sm">Welcome back, {user.name}</h2>
-                    <p className="text-lg text-slate-600 font-medium mt-2 max-w-2xl">
-                        Your cognitive health metrics are ready. System status is <span className="text-emerald-600 font-bold">Optimal</span>.
+                    <h2 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200 drop-shadow-sm">Welcome back, {user.name}</h2>
+                    <p className="text-lg text-slate-400 font-medium mt-2 max-w-2xl">
+                        Your cognitive health metrics are ready. System status is <span className="text-emerald-400 font-bold">Optimal</span>.
                     </p>
                 </div>
 
@@ -73,16 +86,16 @@ export default function DashboardPage() {
                     <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '100ms' }}>
                         <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Total Sessions</CardTitle>
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-400">Total Sessions</CardTitle>
                             <AnimatedIcon type="chart" className="scale-75" />
                         </CardHeader>
                         <CardContent className="relative z-10">
-                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
-                                <div className="text-4xl font-black text-indigo-900">
+                            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 w-fit shadow-md">
+                                <div className="text-4xl font-black text-white">
                                     <AnimatedCounter value={sessions.length} />
                                 </div>
                             </div>
-                            <p className="text-sm font-medium text-slate-600 mt-3 flex items-center gap-2">
+                            <p className="text-sm font-medium text-slate-400 mt-3 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
                                 Lifetime assessments
                             </p>
@@ -93,13 +106,13 @@ export default function DashboardPage() {
                     <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '200ms' }}>
                         <div className="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Avg Stress</CardTitle>
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-400">Avg Stress</CardTitle>
                             <AnimatedIcon type="brain" className="scale-75" />
                         </CardHeader>
                         <CardContent className="relative z-10">
-                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
-                                <div className="text-4xl font-black text-slate-900">
-                                    <AnimatedCounter value={avgStress} />
+                            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 w-fit shadow-md">
+                                <div className="text-4xl font-black text-white">
+                                    <AnimatedCounter value={Math.round(avgStress)} />
                                 </div>
                             </div>
                             <p className={`text-sm font-bold mt-3 inline-block px-2 py-0.5 rounded-lg ${overallStatus.badgeInfo}`}>
@@ -112,16 +125,16 @@ export default function DashboardPage() {
                     <Card variant="neo" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '300ms' }}>
                         <div className="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Wellness Score</CardTitle>
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-400">Wellness Score</CardTitle>
                             <AnimatedIcon type="heart" className="scale-75" />
                         </CardHeader>
                         <CardContent className="relative z-10">
-                            <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 w-fit shadow-sm">
-                                <div className="text-4xl font-black text-emerald-600">
-                                    <AnimatedCounter value={wellnessScore} />
+                            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 w-fit shadow-md">
+                                <div className="text-4xl font-black text-emerald-400">
+                                    <AnimatedCounter value={Math.round(wellnessScore)} />
                                 </div>
                             </div>
-                            <p className="text-sm font-medium text-emerald-800/70 mt-3">
+                            <p className="text-sm font-medium text-emerald-300/70 mt-3">
                                 +2% from last week
                             </p>
                         </CardContent>
@@ -180,33 +193,33 @@ export default function DashboardPage() {
                     </Card>
 
                     {/* Recent History */}
-                    <Card variant="neo" className="col-span-3 animate-slide-up bg-white/40" style={{ animationDelay: '600ms' }}>
+                    <Card variant="neo" className="col-span-3 animate-slide-up bg-white/5" style={{ animationDelay: '600ms' }}>
                         <CardHeader>
-                            <CardTitle className="text-xl font-bold text-slate-800">Recent Activity</CardTitle>
-                            <CardDescription className="text-slate-500 font-medium">
+                            <CardTitle className="text-xl font-bold text-white">Recent Activity</CardTitle>
+                            <CardDescription className="text-slate-400 font-medium">
                                 Your last 3 stress assessment results.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
                                 {loading ? (
-                                    <div className="text-sm text-muted-foreground animate-pulse p-4 text-center">Loading history...</div>
+                                    <div className="text-sm text-slate-400 animate-pulse p-4 text-center">Loading history...</div>
                                 ) : sessions.length === 0 ? (
-                                    <div className="text-sm text-muted-foreground p-4 text-center bg-white/50 rounded-xl border border-white/50">No sessions recorded yet.</div>
+                                    <div className="text-sm text-slate-400 p-4 text-center bg-white/5 rounded-xl border border-white/10">No sessions recorded yet.</div>
                                 ) : (
                                     sessions.slice(0, 5).map((session, i) => (
                                         <div
                                             key={session.id}
                                             onClick={() => router.push(`/report?session=${session.id}`)}
-                                            className="group flex items-center justify-between cursor-pointer hover:bg-white/80 p-3 rounded-xl transition-all duration-300 border border-transparent hover:border-indigo-100 hover:shadow-md"
+                                            className="group flex items-center justify-between cursor-pointer hover:bg-white/10 p-3 rounded-xl transition-all duration-300 border border-transparent hover:border-white/10 hover:shadow-md"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm border border-indigo-100 group-hover:scale-110 transition-transform">
+                                                <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold text-sm border border-indigo-500/30 group-hover:scale-110 transition-transform">
                                                     #{session.id.toString().slice(-3)}
                                                 </div>
                                                 <div className="space-y-0.5">
-                                                    <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Cognitive Check</p>
-                                                    <p className="text-xs text-slate-500 font-medium">{new Date(session.created_at).toLocaleDateString()}</p>
+                                                    <p className="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">Cognitive Check</p>
+                                                    <p className="text-xs text-slate-400 font-medium">{new Date(session.created_at).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                             <div className={`text-sm font-black px-3 py-1.5 rounded-lg border ${getStressLevel(session.avg_stress).badgeInfo}`}>
