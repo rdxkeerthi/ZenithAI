@@ -619,6 +619,11 @@ graph TD
 
 
 
+
+## Report PDF 
+
+
+
 [Download the full PDF here](docs/stress_report_39_2026-01-04.pdf)
 
 
@@ -646,7 +651,10 @@ cd ZenithAI
 *   **15%** increase in focus.
 
 ## License
-MIT License.
+Apache 2.0 License.
+
+## Contact
+Created by [rdxkeerthi](https://github.com/rdxkeerthi).
 
 ## Acknowledgments
 *   Google MediaPipe
