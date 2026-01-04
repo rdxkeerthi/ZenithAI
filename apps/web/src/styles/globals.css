@@ -4,7 +4,8 @@
 
 @layer base {
     :root {
-        --background: 0 0% 100%;
+        --background: 220 30% 98%;
+        /* Slightly cooler/brighter white */
         --foreground: 222.2 84% 4.9%;
 
         --card: 0 0% 100%;
@@ -13,9 +14,11 @@
         --popover: 0 0% 100%;
         --popover-foreground: 222.2 84% 4.9%;
 
-        --primary: 221.2 83.2% 53.3%;
+        /* Vibrant Indigo Primary */
+        --primary: 245 80% 60%;
         --primary-foreground: 210 40% 98%;
 
+        /* Cool Slate Secondary */
         --secondary: 210 40% 96.1%;
         --secondary-foreground: 222.2 47.4% 11.2%;
 
@@ -30,9 +33,10 @@
 
         --border: 214.3 31.8% 91.4%;
         --input: 214.3 31.8% 91.4%;
-        --ring: 221.2 83.2% 53.3%;
+        --ring: 245 80% 60%;
 
-        --radius: 0.5rem;
+        --radius: 1rem;
+        /* More rounded for modern feel */
     }
 
     .dark {
@@ -45,7 +49,8 @@
         --popover: 222.2 84% 4.9%;
         --popover-foreground: 210 40% 98%;
 
-        --primary: 217.2 91.2% 59.8%;
+        --primary: 245 80% 65%;
+        /* Brighter in dark mode */
         --primary-foreground: 222.2 47.4% 11.2%;
 
         --secondary: 217.2 32.6% 17.5%;
@@ -62,7 +67,7 @@
 
         --border: 217.2 32.6% 17.5%;
         --input: 217.2 32.6% 17.5%;
-        --ring: 224.3 76.3% 48%;
+        --ring: 245 80% 65%;
     }
 }
 
@@ -72,6 +77,24 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    }
+}
+
+@layer utilities {
+    .glass {
+        @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-lg;
+    }
+
+    .glass-card {
+        @apply bg-white/80 backdrop-blur-md border border-slate-100/50 shadow-xl transition-all duration-300 hover:shadow-2xl hover:bg-white/90;
+    }
+
+    .gradient-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 font-bold;
+    }
+
+    .gradient-bg {
+        @apply bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50;
     }
 }

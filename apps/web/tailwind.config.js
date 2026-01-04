@@ -66,10 +66,41 @@ module.exports = {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
                 },
+                "float": {
+                    "0%, 100%": { transform: "translateY(0)" },
+                    "50%": { transform: "translateY(-10px)" },
+                },
+                "slide-up": {
+                    "0%": { opacity: "0", transform: "translateY(20px)" },
+                    "100%": { opacity: "1", transform: "translateY(0)" },
+                },
+                "scale-in": {
+                    "0%": { opacity: "0", transform: "scale(0.95)" },
+                    "100%": { opacity: "1", transform: "scale(1)" },
+                },
+                "pulse-slow": {
+                    "0%, 100%": { opacity: "1" },
+                    "50%": { opacity: "0.5" },
+                },
+                "gradient-xy": {
+                    "0%, 100%": {
+                        "background-size": "400% 400%",
+                        "background-position": "left center"
+                    },
+                    "50%": {
+                        "background-size": "200% 200%",
+                        "background-position": "right center"
+                    }
+                }
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+                "float": "float 6s ease-in-out infinite",
+                "slide-up": "slide-up 0.5s ease-out forwards",
+                "scale-in": "scale-in 0.3s ease-out forwards",
+                "pulse-slow": "pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                "gradient-xy": "gradient-xy 15s ease infinite",
             },
         },
     },
