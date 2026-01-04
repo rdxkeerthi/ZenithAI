@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler } from 'chart.js'
+import { Line } from 'react-chartjs-2'
 
 // Import games
 import ReactionTimeGame from './games/ReactionTime'
@@ -20,33 +22,33 @@ import BreathingExerciseGame from './games/BreathingExercise'
 // Import face tracking
 import FaceTracking from './FaceTracking'
 
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
+
 const ALL_GAMES = [
-    { id: 1, name: 'Reaction Time', component: ReactionTimeGame, emoji: '⚡' },
-    { id: 2, name: 'Memory Match', component: MemoryMatchGame, emoji: '🧠' },
-    { id: 3, name: 'Pattern Recognition', component: PatternRecognitionGame, emoji: '🔷' },
-    { id: 4, name: 'Color Stroop', component: ColorStroopGame, emoji: '🎨' },
-    { id: 5, name: 'Number Sequence', component: NumberSequenceGame, emoji: '🔢' },
-    { id: 6, name: 'Maze Navigator', component: MazeNavigatorGame, emoji: '🗺️' },
-    { id: 7, name: 'Whack-a-Mole', component: WhackAMoleGame, emoji: '🔨' },
-    { id: 8, name: 'Puzzle Slider', component: PuzzleSliderGame, emoji: '🧩' },
-    { id: 9, name: 'Focus Tracker', component: FocusTrackerGame, emoji: '🎯' },
-    { id: 10, name: 'Breathing Exercise', component: BreathingExerciseGame, emoji: '🧘' }
+    { id: 1, name: 'Reaction Time', component: ReactionTimeGame, emoji: '⚡', description: 'Click as fast as you can when the color changes.' },
+    { id: 2, name: 'Memory Match', component: MemoryMatchGame, emoji: '🧠', description: 'Find matching pairs of cards.' },
+    { id: 3, name: 'Pattern Recognition', component: PatternRecognitionGame, emoji: '🔷', description: 'Repeat the pattern shown to you.' },
+    { id: 4, name: 'Color Stroop', component: ColorStroopGame, emoji: '🎨', description: 'Select the color of the text, not the word.' },
+    { id: 5, name: 'Number Sequence', component: NumberSequenceGame, emoji: '🔢', description: 'Enter the missing number in the sequence.' },
+    { id: 6, name: 'Maze Navigator', component: MazeNavigatorGame, emoji: '🗺️', description: 'Navigate to the exit without hitting walls.' },
+    { id: 7, name: 'Whack-a-Mole', component: WhackAMoleGame, emoji: '🔨', description: 'Hit the targets as they appear.' },
+    { id: 8, name: 'Puzzle Slider', component: PuzzleSliderGame, emoji: '🧩', description: 'Slide tiles to form the correct image.' },
+    { id: 9, name: 'Focus Tracker', component: FocusTrackerGame, emoji: '🎯', description: 'Keep your mouse on the moving target.' },
+    { id: 10, name: 'Breathing Exercise', component: BreathingExerciseGame, emoji: '🧘', description: 'Follow the breathing accumulation rhythm.' }
 ]
 
 export default function PlayPage() {
     const router = useRouter()
     const [user, setUser] = useState(null)
     const [sessionId, setSessionId] = useState(null)
-    const [currentGameIndex, setCurrentGameIndex] = useState(null)
+    const [currentGameIndex, setCurrentGameIndex] = useState(-1) // -1 means not started
     const [selectedGames, setSelectedGames] = useState([])
     const [stressData, setStressData] = useState([])
     const [currentStress, setCurrentStress] = useState(null)
-    const [gameStarted, setGameStarted] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [completedGames, setCompletedGames] = useState(new Set())
+    const [gameState, setGameState] = useState('intro') // intro, playing, transition, completed
 
     const faceTrackingRef = useRef(null)
-    const scrollContainerRef = useRef(null)
 
     useEffect(() => {
         const token = localStorage.getItem('token')
@@ -58,30 +60,6 @@ export default function PlayPage() {
         }
         setUser(JSON.parse(userData))
     }, [router])
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        const index = parseInt(entry.target.getAttribute('data-index'))
-                        if (!isNaN(index)) {
-                            setCurrentGameIndex(index)
-                        }
-                    }
-                })
-            },
-            { root: scrollContainerRef.current, threshold: 0.6 }
-        )
-
-        if (gameStarted) {
-            setTimeout(() => {
-                const sections = document.querySelectorAll('.game-snap-section')
-                sections.forEach((section) => observer.observe(section))
-            }, 100)
-        }
-        return () => observer.disconnect()
-    }, [selectedGames, gameStarted])
 
     const selectRandomGames = () => {
         const shuffled = [...ALL_GAMES]
@@ -109,7 +87,7 @@ export default function PlayPage() {
             const data = await response.json()
             setSessionId(data.session_id)
             setCurrentGameIndex(0)
-            setGameStarted(true)
+            setGameState('playing')
 
             setTimeout(() => {
                 if (faceTrackingRef.current) faceTrackingRef.current.startTracking()
@@ -122,40 +100,48 @@ export default function PlayPage() {
         }
     }
 
-    const handleGameComplete = async (gameData, index) => {
-        if (completedGames.has(index)) return
-
+    const handleGameComplete = async (gameData) => {
+        setGameState('saving')
         try {
+            const currentGame = selectedGames[currentGameIndex]
+
             await fetch(`http://localhost:8000/api/v1/stress/session/${sessionId}/game`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    game_name: selectedGames[index].name,
-                    game_number: index + 1,
+                    game_name: currentGame.name,
+                    game_number: currentGameIndex + 1,
                     score: gameData.score || 0,
                     duration: gameData.duration || 0,
                     face_data: JSON.stringify(gameData.faceData || {}),
-                    stress_scores: JSON.stringify(stressData),
+                    stress_scores: JSON.stringify(stressData.slice(-50)), // optimize payload
                     avg_stress: stressData.length > 0 ? stressData.reduce((a, b) => a + b, 0) / stressData.length : 50,
                     max_stress: stressData.length > 0 ? Math.max(...stressData) : 50,
                     min_stress: stressData.length > 0 ? Math.min(...stressData) : 50
                 })
             })
 
-            setCompletedGames(prev => new Set([...prev, index]))
-            setStressData([])
-
-            if (index < selectedGames.length - 1) {
-                const nextSection = document.getElementById(`game-section-${index + 1}`)
-                if (nextSection) nextSection.scrollIntoView({ behavior: 'smooth' })
+            if (currentGameIndex < selectedGames.length - 1) {
+                setGameState('transition')
             } else {
-                const footerSection = document.getElementById('footer-section')
-                if (footerSection) footerSection.scrollIntoView({ behavior: 'smooth' })
+                setGameState('completed')
                 await completeSession()
             }
         } catch (error) {
             console.error('Error saving game data:', error)
+            // Proceed anyway to not block user
+            if (currentGameIndex < selectedGames.length - 1) {
+                setGameState('transition')
+            } else {
+                setGameState('completed')
+            }
         }
+    }
+
+    const proceedToNextGame = () => {
+        setCurrentGameIndex(prev => prev + 1)
+        setGameState('playing')
+        setStressData([]) // Reset stress trend for new game context? Or keep it? keeping it continuous might be better, but clearing strictly for game analysis makes sense. Let's keep continuous for the user view.
     }
 
     const completeSession = async () => {
@@ -175,148 +161,214 @@ export default function PlayPage() {
         setCurrentStress(stressScore)
         setStressData(prev => {
             const newData = [...prev, stressScore]
-            if (newData.length > 50) return newData.slice(newData.length - 50)
+            if (newData.length > 30) return newData.slice(newData.length - 30)
             return newData
         })
     }
 
-    if (!user) return <div className="flex h-screen items-center justify-center">Loading user data...</div>
+    // Chart Configuration
+    const chartData = {
+        labels: stressData.map((_, i) => i),
+        datasets: [
+            {
+                label: 'Stress Level',
+                data: stressData,
+                fill: true,
+                backgroundColor: (context) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+                    gradient.addColorStop(1, 'rgba(99, 102, 241, 0.05)');
+                    return gradient;
+                },
+                borderColor: 'rgba(99, 102, 241, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                pointRadius: 0,
+            },
+        ],
+    };
 
-    if (!gameStarted) {
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        },
+        scales: {
+            x: { display: false },
+            y: {
+                display: false,
+                min: 0,
+                max: 100
+            }
+        },
+        animation: {
+            duration: 0
+        },
+        maintainAspectRatio: false
+    }
+
+    if (!user) return <div className="flex h-screen items-center justify-center">Loading...</div>
+
+    if (gameState === 'intro') {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-                <Card className="max-w-xl w-full">
-                    <CardHeader className="text-center">
-                        <div className="mx-auto w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center text-2xl mb-2">
+                <Card className="max-w-xl w-full border-2 border-indigo-100 shadow-xl">
+                    <CardHeader className="text-center pb-8 border-b bg-indigo-50/30">
+                        <div className="mx-auto w-16 h-16 bg-white shadow-sm border border-indigo-100 rounded-2xl flex items-center justify-center text-3xl mb-4 text-indigo-600">
                             🧠
                         </div>
-                        <CardTitle className="text-3xl">Cognitive Assessment</CardTitle>
-                        <p className="text-muted-foreground">
-                            You are about to begin a session consisting of 4 random cognitive tasks.
-                            During this session, your facial expressions will be analyzed to monitor stress levels.
+                        <CardTitle className="text-3xl font-bold text-slate-900">Cognitive Stress Assessment</CardTitle>
+                        <p className="text-slate-500 mt-2 text-lg">
+                            Evaluate your mental performance and stress response through 4 rapid-fire cognitive challenges.
                         </p>
                     </CardHeader>
-                    <CardContent className="flex flex-col gap-4">
-                        <div className="bg-blue-50 text-blue-800 p-4 rounded-md text-sm">
-                            <strong>Privacy Notice:</strong> Camera data is processed locally for stress analysis and is not stored permanently.
+                    <CardContent className="pt-8 flex flex-col gap-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                                <div className="text-2xl mb-1">📷</div>
+                                <div className="font-semibold text-slate-700">Facial Analysis</div>
+                                <div className="text-xs text-slate-500">Real-time expression tracking</div>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                                <div className="text-2xl mb-1">🎮</div>
+                                <div className="font-semibold text-slate-700">4 Mini-Games</div>
+                                <div className="text-xs text-slate-500">Memory, Focus, & Reaction</div>
+                            </div>
                         </div>
+
                         <Button
                             size="lg"
                             onClick={startSession}
                             disabled={loading}
-                            className="w-full"
+                            className="w-full text-lg h-14 shadow-lg shadow-indigo-200"
                         >
-                            {loading ? 'Initializing Environment...' : 'Begin Session'}
+                            {loading ? 'Initializing Environment...' : 'Start Assessment Session'}
                         </Button>
+                        <p className="text-center text-xs text-slate-400">
+                            Grant camera access when prompted • Results processed locally
+                        </p>
                     </CardContent>
                 </Card>
             </div>
         )
     }
 
+    const ActiveGame = selectedGames[currentGameIndex]?.component
+
     return (
-        <div className="h-screen w-screen bg-slate-100 overflow-hidden p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 grid-rows-2 gap-4 h-full w-full max-w-7xl mx-auto">
+        <div className="h-screen w-screen bg-slate-100 overflow-hidden p-4 md:p-6 lg:p-8 flex gap-6">
 
-                {/* 1. Game Container */}
-                <Card className="col-span-1 row-span-1 md:row-span-2 flex flex-col overflow-hidden border-2 border-primary/10">
-                    <div className="p-4 border-b bg-muted/30 flex justify-between items-center">
-                        <div className="font-semibold flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                            Active Task
+            {/* LEFT COLUMN: GAME AREA */}
+            <div className="flex-1 flex flex-col h-full gap-6">
+
+                {/* Header / Progress */}
+                <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-xl">
+                            {selectedGames[currentGameIndex]?.emoji}
                         </div>
-                        <span className="text-xs font-mono bg-primary/10 px-2 py-1 rounded text-primary">
-                            Step {(currentGameIndex || 0) + 1}/4
-                        </span>
-                    </div>
-
-                    <div
-                        ref={scrollContainerRef}
-                        className="flex-1 overflow-y-auto snap-y snap-mandatory scrollbar-none"
-                    >
-                        {selectedGames.map((Game, idx) => {
-                            const GameComponent = Game.component
-                            const isCompleted = completedGames.has(idx)
-                            return (
-                                <div
-                                    key={idx}
-                                    data-index={idx}
-                                    id={`game-section-${idx}`}
-                                    className="game-snap-section h-full w-full flex flex-col snap-start p-6"
-                                >
-                                    <h3 className="text-2xl font-bold mb-2">{Game.name}</h3>
-                                    <div className={cn(
-                                        "flex-1 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden relative",
-                                        isCompleted && "opacity-50 grayscale pointer-events-none"
-                                    )}>
-                                        <GameComponent onComplete={(data) => handleGameComplete(data, idx)} />
-
-                                        {isCompleted && (
-                                            <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm z-10">
-                                                <span className="bg-green-100 text-green-800 font-bold px-4 py-2 rounded-lg border border-green-200">
-                                                    Task Completed
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )
-                        })}
-
-                        <div
-                            id="footer-section"
-                            className="game-snap-section h-full w-full flex items-center justify-center snap-start"
-                        >
-                            <div className="text-center">
-                                <h2 className="text-3xl font-bold mb-4">Assessment Complete</h2>
-                                <Button onClick={completeSession} size="lg">Generate Report</Button>
-                            </div>
+                        <div>
+                            <h2 className="font-bold text-slate-900">{selectedGames[currentGameIndex]?.name}</h2>
+                            <p className="text-xs text-slate-500">{selectedGames[currentGameIndex]?.description}</p>
                         </div>
                     </div>
-                </Card>
-
-                {/* 2. Face Tracking Feed */}
-                <Card className="col-span-1 row-span-1 flex flex-col overflow-hidden">
-                    <div className="p-3 border-b bg-muted/30 flex justify-between items-center">
-                        <span className="text-sm font-semibold">Video Stream</span>
-                        <span className="text-xs text-muted-foreground">Processing Active</span>
-                    </div>
-                    <div className="flex-1 bg-black relative flex items-center justify-center overflow-hidden">
-                        <FaceTracking ref={faceTrackingRef} onStressUpdate={handleStressUpdate} />
-                        <div className="absolute top-4 right-4 px-2 py-1 bg-black/60 text-white text-xs rounded font-mono">
-                            LIVE
-                        </div>
-                    </div>
-                </Card>
-
-                {/* 3. Analytics Panel */}
-                <div className="col-span-1 row-span-1 grid grid-cols-2 gap-4">
-                    <Card className="flex flex-col justify-center items-center p-6">
-                        <p className="text-sm text-muted-foreground mb-1">Current Stress</p>
-                        <div className={cn(
-                            "text-5xl font-bold",
-                            !currentStress ? "text-muted" :
-                                currentStress < 30 ? "text-emerald-500" :
-                                    currentStress < 70 ? "text-amber-500" : "text-red-500"
-                        )}>
-                            {currentStress ? Math.round(currentStress) : '--'}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-2">Index (0-100)</p>
-                    </Card>
-
-                    <Card className="flex flex-col p-4 relative overflow-hidden">
-                        <p className="text-sm font-semibold mb-2">Real-time Trend</p>
-                        <div className="flex-1 flex items-end gap-1">
-                            {stressData.slice(-20).map((val, i) => (
+                    <div className="flex items-center gap-4">
+                        <div className="flex gap-1">
+                            {selectedGames.map((_, i) => (
                                 <div
                                     key={i}
-                                    className="flex-1 bg-primary/20 rounded-t-sm"
-                                    style={{ height: `${val}%` }}
-                                ></div>
+                                    className={cn(
+                                        "w-3 h-3 rounded-full transition-all",
+                                        i === currentGameIndex ? "bg-indigo-600 scale-125" :
+                                            i < currentGameIndex ? "bg-emerald-500" : "bg-slate-200"
+                                    )}
+                                />
                             ))}
                         </div>
-                    </Card>
+                        <span className="text-sm font-mono text-slate-500"> Step {currentGameIndex + 1}/4 </span>
+                    </div>
                 </div>
+
+                {/* GAME CONTAINER */}
+                <div className="flex-1 relative bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col">
+                    {gameState === 'playing' && ActiveGame && (
+                        <div className="flex-1 flex flex-col">
+                            <ActiveGame onComplete={handleGameComplete} />
+                        </div>
+                    )}
+
+                    {gameState === 'transition' && (
+                        <div className="absolute inset-0 z-20 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
+                            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mb-4 shadow-sm border border-emerald-200">
+                                ✓
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800 mb-2">Task Completed!</h2>
+                            <p className="text-slate-500 mb-6">Take a deep breath...</p>
+                            <Button onClick={proceedToNextGame} size="lg" className="w-48 shadow-lg shadow-indigo-200">
+                                Next Challenge →
+                            </Button>
+                        </div>
+                    )}
+
+                    {gameState === 'saving' && (
+                        <div className="absolute inset-0 z-30 bg-black/5 backdrop-blur-[2px] flex items-center justify-center">
+                            <div className="bg-white p-4 rounded-xl shadow-xl flex items-center gap-3">
+                                <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                                <span className="font-medium text-slate-700">Saving Results...</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* RIGHT COLUMN: METRICS */}
+            <div className="w-[320px] flex flex-col gap-6">
+
+                {/* Camera Feed */}
+                <Card className="overflow-hidden border-2 border-indigo-100 shadow-md">
+                    <CardHeader className="p-3 bg-slate-50 border-b flex flex-row justify-between items-center">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Live Analysis</span>
+                        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    </CardHeader>
+                    <div className="aspect-[4/3] bg-black relative">
+                        <FaceTracking ref={faceTrackingRef} onStressUpdate={handleStressUpdate} />
+                    </div>
+                </Card>
+
+                {/* Real-time Stress Graph */}
+                <Card className="flex-1 flex flex-col shadow-md border-slate-200">
+                    <CardHeader className="p-4 border-b">
+                        <CardTitle className="text-sm font-bold text-slate-700 flex justify-between">
+                            <span>Stress Index</span>
+                            <span className={cn(
+                                "text-lg",
+                                !currentStress ? "text-slate-400" :
+                                    currentStress < 40 ? "text-emerald-500" :
+                                        currentStress < 70 ? "text-amber-500" : "text-red-500"
+                            )}>
+                                {currentStress ? Math.round(currentStress) : '--'}
+                            </span>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1 p-0 relative min-h-[150px]">
+                        <div className="absolute inset-0 p-4">
+                            <Line data={chartData} options={chartOptions} />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-indigo-600 text-white border-none shadow-lg shadow-indigo-200">
+                    <CardContent className="p-6">
+                        <div className="text-xs opacity-70 mb-1 uppercase tracking-wider font-semibold">Session Status</div>
+                        <div className="font-medium text-lg">Recording High-Res Biometrics</div>
+                        <div className="mt-4 flex gap-2">
+                            <span className="px-2 py-1 bg-white/20 rounded text-xs">👀 Gaze</span>
+                            <span className="px-2 py-1 bg-white/20 rounded text-xs">😐 Micro-expressions</span>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )

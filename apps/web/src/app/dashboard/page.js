@@ -142,9 +142,13 @@ export default function DashboardPage() {
                                     <div className="text-sm text-muted-foreground">No sessions recorded yet.</div>
                                 ) : (
                                     sessions.slice(0, 5).map((session, i) => (
-                                        <div key={session.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                                        <div
+                                            key={session.id}
+                                            onClick={() => router.push(`/report?session=${session.id}`)}
+                                            className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0 cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+                                        >
                                             <div className="space-y-1">
-                                                <p className="text-sm font-medium leading-none">Assessment #{session.id.toString().slice(-3)}</p>
+                                                <p className="text-sm font-medium leading-none text-primary">Assessment #{session.id.toString().slice(-3)}</p>
                                                 <p className="text-xs text-muted-foreground">{new Date(session.created_at).toLocaleDateString()}</p>
                                             </div>
                                             <div className={`text-sm font-medium px-2 py-1 rounded-full ${getStressLevel(session.avg_stress).badgeInfo}`}>
